@@ -19,18 +19,28 @@ const defaultTasks = [
 
 function createTaskCard(task) {
     const taskCard = document.createElement("article");
-    taskCard.className = "task-card";
+
+    taskCard.className =
+        "flex justify-between items-center bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1";
 
     taskCard.innerHTML = `
-        <h3>${task.title}</h3>
-        <span class="category">${task.category}</span>
-        <span class="priority ${task.priority}">${task.label}</span>
-        <button class="delete-btn">Eliminar</button>
+        <div class="flex flex-col">
+            <h3 class="text-lg font-bold text-blue-900 dark:text-gray-100">${task.title}</h3>
+            <span class="text-sm text-blue-700 dark:text-gray-300">${task.category}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <span class="px-2 py-1 rounded text-white ${getPriorityColor(task.priority)}">
+                ${task.label}
+            </span>
+
+            <button class="delete-btn bg-red-600 text-white px-2 py-1 rounded hover:bg-red-500 transition">
+                Eliminar
+            </button>
+        </div>
     `;
 
-    const deleteBtn = taskCard.querySelector(".delete-btn");
-
-    deleteBtn.addEventListener("click", function() {
+    taskCard.querySelector(".delete-btn").addEventListener("click", () => {
         taskCard.remove();
         saveTasks();
     });
@@ -45,44 +55,43 @@ function createTaskCard(task) {
 function saveTasks() {
     const tasks = [];
 
-    document.querySelectorAll(".task-card").forEach(card => {
+    document.querySelectorAll("article").forEach(card => {
         const title = card.querySelector("h3").textContent;
-        const category = card.querySelector(".category").textContent;
-        const label = card.querySelector(".priority").textContent;
-        const priorityClass = card.querySelector(".priority").classList[1];
+        const category = card.querySelector("div > span")?.textContent || "";
 
-        tasks.push({ title, category, priority: priorityClass, label });
+        const prioritySpan = card.querySelector("span.px-2");
+        const label = prioritySpan?.textContent || "";
+
+        const priorityClass = prioritySpan?.classList[3] || "";
+
+        let priority = "low";
+        if (priorityClass.includes("red")) priority = "high";
+        if (priorityClass.includes("yellow")) priority = "medium";
+
+        tasks.push({ title, category, priority, label });
     });
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-
-
 /* =========================
-   AÑADIR NUEVA PELÍCULA CON CATEGORÍA Y PRIORIDAD
+   AÑADIR NUEVA PELÍCULA
 ========================= */
-form.addEventListener("submit", function(event) {
+
+form.addEventListener("submit", event => {
     event.preventDefault();
 
     const taskName = input.value.trim();
-
     const category = document.getElementById("category-select").value;
     const priority = document.getElementById("priority-select").value;
 
     if (taskName !== "") {
+        const label =
+            priority === "high" ? "Top" :
+            priority === "medium" ? "Interesante" :
+            "Ligera";
 
-        // Traducción de la prioridad a la etiqueta visible
-        const label = priority === "high" ? "Top" :
-                      priority === "medium" ? "Interesante" :
-                      "Ligera";
-
-        const newTask = {
-            title: taskName,
-            category: category,
-            priority: priority,
-            label: label
-        };
+        const newTask = { title: taskName, category, priority, label };
 
         createTaskCard(newTask);
         saveTasks();
@@ -94,8 +103,7 @@ form.addEventListener("submit", function(event) {
    CARGAR AL INICIAR
 ========================= */
 
-document.addEventListener("DOMContentLoaded", function() {
-
+document.addEventListener("DOMContentLoaded", () => {
     let storedTasks = JSON.parse(localStorage.getItem("tasks"));
 
     if (!storedTasks || storedTasks.length === 0) {
@@ -103,12 +111,8 @@ document.addEventListener("DOMContentLoaded", function() {
         localStorage.setItem("tasks", JSON.stringify(defaultTasks));
     }
 
-    storedTasks.forEach(task => {
-        createTaskCard(task);
-    });
-
+    storedTasks.forEach(task => createTaskCard(task));
 });
-
 
 /* =========================
    ELEGIR PELÍCULA ALEATORIA
@@ -117,11 +121,10 @@ document.addEventListener("DOMContentLoaded", function() {
 const randomBtn = document.getElementById("random-movie-btn");
 const randomResult = document.getElementById("random-result");
 
-randomBtn.addEventListener("click", function() {
-
+randomBtn.addEventListener("click", () => {
     const movies = [];
 
-    document.querySelectorAll(".task-card h3").forEach(movie => {
+    document.querySelectorAll("article h3").forEach(movie => {
         movies.push(movie.textContent);
     });
 
@@ -131,12 +134,8 @@ randomBtn.addEventListener("click", function() {
     }
 
     const randomIndex = Math.floor(Math.random() * movies.length);
-    const chosenMovie = movies[randomIndex];
-
-    randomResult.textContent = "🎬 Hoy toca ver: " + chosenMovie;
-
+    randomResult.textContent = "🎬 Hoy toca ver: " + movies[randomIndex];
 });
-
 
 /* =========================
    BUSCAR PELÍCULAS
@@ -144,20 +143,29 @@ randomBtn.addEventListener("click", function() {
 
 const searchInput = document.getElementById("search-input");
 
-searchInput.addEventListener("input", function() {
-
+searchInput.addEventListener("input", () => {
     const searchText = searchInput.value.toLowerCase();
 
-    document.querySelectorAll(".task-card").forEach(card => {
-
+    document.querySelectorAll("article").forEach(card => {
         const title = card.querySelector("h3").textContent.toLowerCase();
-
-        if (title.includes(searchText)) {
-            card.style.display = "flex";
-        } else {
-            card.style.display = "none";
-        }
-
+        card.style.display = title.includes(searchText) ? "flex" : "none";
     });
-
 });
+
+/* =========================
+   MODO OSCURO
+========================= */
+
+document.getElementById("theme-toggle").addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+});
+
+/* =========================
+   COLORES DE PRIORIDAD
+========================= */
+
+function getPriorityColor(priority) {
+    if (priority === "high") return "bg-red-700 dark:bg-red-600";
+    if (priority === "medium") return "bg-yellow-600 dark:bg-yellow-500";
+    return "bg-green-700 dark:bg-green-600";
+}

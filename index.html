@@ -24,80 +24,46 @@
     </aside>
 
     <main>
-      <section class="task-list">
 
-        <!-- ACCIÓN -->
-        <article class="task-card">
-          <h3>El Caballero Oscuro</h3>
-          <span class="category">Acción</span>
-          <span class="priority high">Top</span>
-        </article>
-        <article class="task-card">
-          <h3>Mad Max: Furia en la Carretera</h3>
-          <span class="category">Acción</span>
-          <span class="priority high">Imprescindible</span>
-        </article>
-        <article class="task-card">
-          <h3>John Wick</h3>
-          <span class="category">Acción</span>
-          <span class="priority medium">Interesante</span>
-        </article>
+      <input 
+  type="text" 
+  id="search-input" 
+  placeholder="Buscar película..."
+>
 
-        <!-- COMEDIA -->
-        <article class="task-card">
-          <h3>Superbad</h3>
-          <span class="category">Comedia</span>
-          <span class="priority low">Ligera</span>
-        </article>
-        <article class="task-card">
-          <h3>La Gran Apuesta</h3>
-          <span class="category">Comedia</span>
-          <span class="priority medium">Interesante</span>
-        </article>
-        <article class="task-card">
-          <h3>Deadpool</h3>
-          <span class="category">Comedia</span>
-          <span class="priority medium">Divertida</span>
-        </article>
+      <form id="task-form">
+  <input type="text" id="task-input" placeholder="Añadir nueva película..." required>
+  
+  <!-- Selección de categoría -->
+  <select id="category-select">
+    <option value="Acción">Acción</option>
+    <option value="Comedia">Comedia</option>
+    <option value="Ciencia Ficción">Ciencia Ficción</option>
+    <option value="Drama">Drama</option>
+  </select>
 
-        <!-- CIENCIA FICCIÓN -->
-        <article class="task-card">
-          <h3>Interstellar</h3>
-          <span class="category">Ciencia Ficción</span>
-          <span class="priority high">Imprescindible</span>
-        </article>
-        <article class="task-card">
-          <h3>Matrix</h3>
-          <span class="category">Ciencia Ficción</span>
-          <span class="priority high">Top</span>
-        </article>
-        <article class="task-card">
-          <h3>Blade Runner 2049</h3>
-          <span class="category">Ciencia Ficción</span>
-          <span class="priority medium">Interesante</span>
-        </article>
+  <!-- Selección de prioridad -->
+  <select id="priority-select">
+    <option value="high">Alta</option>
+    <option value="medium" selected>Media</option>
+    <option value="low">Baja</option>
+  </select>
 
-        <!-- DRAMA -->
-        <article class="task-card">
-          <h3>La La Land</h3>
-          <span class="category">Drama</span>
-          <span class="priority medium">Interesante</span>
-        </article>
-        <article class="task-card">
-          <h3>Forrest Gump</h3>
-          <span class="category">Drama</span>
-          <span class="priority medium">Clásico</span>
-        </article>
-        <article class="task-card">
-          <h3>Parásitos</h3>
-          <span class="category">Drama</span>
-          <span class="priority high">Imprescindible</span>
-        </article>
+  <button type="submit">Añadir</button>
+</form>
 
-      </section>
+  <button id="random-movie-btn">🎬 Elegir película para esta noche</button>
+
+<p id="random-result"></p>
+
+<section class="task-list">
+</section>
+
     </main>
 
-  </div>
+    </div>
+
+  <script src="app.js"></script>
 
 </body>
 </html>

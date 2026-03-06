@@ -14,7 +14,6 @@
     }
   </script>
 
-  <!-- TU CSS (vacío o casi vacío) -->
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -22,17 +21,21 @@
 
   <!-- HEADER -->
   <header class="bg-gray-900/80 dark:bg-gray-800/80 backdrop-blur-sm text-red-400 p-4 shadow-lg mb-6 rounded">
-    <h1 class="text-3xl font-bold text-center">🎬 MovieNight Planner</h1>
-  </header>
+    <div class="container mx-auto flex items-center justify-between">
+      <div class="w-12"></div>
 
-  <!-- BOTÓN MODO OSCURO -->
-  <div class="flex justify-center mb-4">
-    <button 
-      id="theme-toggle"
-      class="px-4 py-2 bg-gray-800 text-yellow-400 rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition">
-      Alternar modo oscuro
-    </button>
-  </div>
+      <h1 class="text-3xl font-bold text-center flex-1">🎬 MovieNight Planner</h1>
+
+      <button 
+        id="theme-toggle"
+        class="w-12 h-12 flex items-center justify-center bg-gray-800 dark:bg-gray-700 text-yellow-400 rounded-full hover:bg-gray-700 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-300"
+        aria-label="Alternar modo oscuro"
+        title="Alternar modo oscuro"
+      >
+        💡
+      </button>
+    </div>
+  </header>
 
   <!-- CONTENEDOR PRINCIPAL -->
   <div class="container mx-auto flex gap-6 px-4">
@@ -44,12 +47,11 @@
       </h2>
 
       <ul class="space-y-2">
-  <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Acción</li>
-  <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Comedia</li>
-  <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Ciencia Ficción</li>
-  <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Drama</li>
-</ul>
-
+        <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Acción</li>
+        <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Comedia</li>
+        <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Ciencia Ficción</li>
+        <li class="cursor-pointer text-blue-900 dark:text-yellow-300 hover:text-blue-700 dark:hover:text-yellow-200 transition font-semibold">Drama</li>
+      </ul>
     </aside>
 
     <!-- MAIN -->
@@ -60,7 +62,7 @@
         type="text" 
         id="search-input" 
         placeholder="Buscar película..."
-        class="w-full p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white focus:ring focus:ring-yellow-400 transition"
+        class="w-full p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white focus:ring focus:ring-yellow-400 focus:outline-none transition"
       >
 
       <!-- FORMULARIO -->
@@ -71,12 +73,12 @@
           id="task-input" 
           placeholder="Añadir nueva película..." 
           required
-          class="flex-1 p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white focus:ring focus:ring-blue-400 transition"
+          class="flex-1 p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white focus:ring focus:ring-blue-400 focus:outline-none transition"
         >
 
         <select 
           id="category-select"
-          class="p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white"
+          class="p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring focus:ring-blue-400 transition"
         >
           <option value="Acción">Acción</option>
           <option value="Comedia">Comedia</option>
@@ -86,7 +88,7 @@
 
         <select 
           id="priority-select"
-          class="p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white"
+          class="p-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring focus:ring-blue-400 transition"
         >
           <option value="high">Alta</option>
           <option value="medium" selected>Media</option>
@@ -95,7 +97,7 @@
 
         <button 
           type="submit"
-          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600 transition"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
         >
           Añadir
         </button>
@@ -104,7 +106,7 @@
       <!-- BOTÓN ALEATORIO -->
       <button 
         id="random-movie-btn"
-        class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 dark:bg-purple-700 dark:hover:bg-purple-600 transition"
+        class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 dark:bg-purple-700 dark:hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
       >
         🎬 Elegir película para esta noche
       </button>

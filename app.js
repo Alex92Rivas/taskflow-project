@@ -135,6 +135,9 @@ randomBtn.addEventListener("click", () => {
 
     const randomIndex = Math.floor(Math.random() * movies.length);
     randomResult.textContent = "🎬 Hoy toca ver: " + movies[randomIndex];
+    randomResult.classList.remove("random-appear");
+    void randomResult.offsetWidth;
+    randomResult.classList.add("random-appear");
 });
 
 /* =========================

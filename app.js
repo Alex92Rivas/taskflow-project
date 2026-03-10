@@ -13,12 +13,27 @@ const defaultTasks = [
     { title: "La La Land", category: "Drama", priority: "medium", label: "Interesante" }
 ];
 
+function getPriorityLabel(priority) {
+    if (priority === "high") return "Top";
+    if (priority === "medium") return "Interesante";
+    return "Ligera";
+}
+
+function isValidTaskTitle(title) {
+    return title.trim().length >= 2;
+}
+
 /* =========================
    CREAR TARJETA
 ========================= */
 
 function createTaskCard(task) {
     const taskCard = document.createElement("article");
+
+    taskCard.dataset.title = task.title;
+    taskCard.dataset.category = task.category;
+    taskCard.dataset.priority = task.priority;
+    taskCard.dataset.label = task.label;
 
     taskCard.className =
         "flex justify-between items-center bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1";
@@ -55,20 +70,13 @@ function createTaskCard(task) {
 function saveTasks() {
     const tasks = [];
 
-    document.querySelectorAll("article").forEach(card => {
-        const title = card.querySelector("h3").textContent;
-        const category = card.querySelector("div > span")?.textContent || "";
-
-        const prioritySpan = card.querySelector("span.px-2");
-        const label = prioritySpan?.textContent || "";
-
-        const priorityClass = prioritySpan?.classList[3] || "";
-
-        let priority = "low";
-        if (priorityClass.includes("red")) priority = "high";
-        if (priorityClass.includes("yellow")) priority = "medium";
-
-        tasks.push({ title, category, priority, label });
+    taskList.querySelectorAll("article").forEach(card => {
+        tasks.push({
+            title: card.dataset.title || "",
+            category: card.dataset.category || "",
+            priority: card.dataset.priority || "low",
+            label: card.dataset.label || "Ligera"
+        });
     });
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -85,18 +93,21 @@ form.addEventListener("submit", event => {
     const category = document.getElementById("category-select").value;
     const priority = document.getElementById("priority-select").value;
 
-    if (taskName !== "") {
-        const label =
-            priority === "high" ? "Top" :
-            priority === "medium" ? "Interesante" :
-            "Ligera";
-
-        const newTask = { title: taskName, category, priority, label };
-
-        createTaskCard(newTask);
-        saveTasks();
-        input.value = "";
+    if (!isValidTaskTitle(taskName)) {
+        alert("Introduce un título válido de al menos 2 caracteres.");
+        return;
     }
+
+    const newTask = {
+        title: taskName,
+        category,
+        priority,
+        label: getPriorityLabel(priority)
+    };
+
+    createTaskCard(newTask);
+    saveTasks();
+    form.reset();
 });
 
 /* =========================

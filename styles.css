@@ -16,3 +16,20 @@
 .random-appear {
   animation: fadeIn 0.4s ease;
 }
+
+/* =========================
+   MODO DE CAMPOS
+========================= */
+
+html:not(.dark) input,
+html:not(.dark) select,
+html:not(.dark) option {
+  color: black;
+  background-color: white;
+}
+
+html.dark input,
+html.dark select,
+html.dark option {
+  color: white;
+}

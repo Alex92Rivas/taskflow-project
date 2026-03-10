@@ -1,6 +1,9 @@
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
 const taskList = document.querySelector(".task-list");
+const randomBtn = document.getElementById("random-movie-btn");
+const randomResult = document.getElementById("random-result");
+const searchInput = document.getElementById("search-input");
 
 /* =========================
    PELÍCULAS INICIALES
@@ -13,6 +16,10 @@ const defaultTasks = [
     { title: "La La Land", category: "Drama", priority: "medium", label: "Interesante" }
 ];
 
+/* =========================
+   FUNCIONES AUXILIARES
+========================= */
+
 function getPriorityLabel(priority) {
     if (priority === "high") return "Top";
     if (priority === "medium") return "Interesante";
@@ -23,10 +30,48 @@ function isValidTaskTitle(title) {
     return title.trim().length >= 2;
 }
 
+function getStoredTasks() {
+    const storedTasks = JSON.parse(localStorage.getItem("tasks"));
+    return Array.isArray(storedTasks) ? storedTasks : [];
+}
+
+/**
+ * Obtiene los títulos de todas las películas de la lista.
+ * @returns {string[]}
+ */
+function getMovieTitles() {
+    const movies = [];
+
+    taskList.querySelectorAll("article h3").forEach(movie => {
+        movies.push(movie.textContent);
+    });
+
+    return movies;
+}
+
+/**
+ * Muestra una película aleatoria en pantalla.
+ * @param {string} movieTitle
+ */
+function showRandomMovie(movieTitle) {
+    randomResult.textContent = `🎬 Hoy toca ver: ${movieTitle}`;
+    randomResult.classList.remove("random-appear");
+    void randomResult.offsetWidth;
+    randomResult.classList.add("random-appear");
+}
+
 /* =========================
    CREAR TARJETA
 ========================= */
 
+/**
+ * Crea una tarjeta de película en la lista.
+ * @param {Object} task
+ * @param {string} task.title
+ * @param {string} task.category
+ * @param {string} task.priority
+ * @param {string} task.label
+ */
 function createTaskCard(task) {
     const taskCard = document.createElement("article");
 
@@ -67,6 +112,9 @@ function createTaskCard(task) {
    GUARDAR EN LOCALSTORAGE
 ========================= */
 
+/**
+ * Guarda las películas actuales en localStorage.
+ */
 function saveTasks() {
     const tasks = [];
 
@@ -115,9 +163,9 @@ form.addEventListener("submit", event => {
 ========================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-    let storedTasks = JSON.parse(localStorage.getItem("tasks"));
+    let storedTasks = getStoredTasks();
 
-    if (!storedTasks || storedTasks.length === 0) {
+    if (storedTasks.length === 0) {
         storedTasks = defaultTasks;
         localStorage.setItem("tasks", JSON.stringify(defaultTasks));
     }
@@ -129,15 +177,8 @@ document.addEventListener("DOMContentLoaded", () => {
    ELEGIR PELÍCULA ALEATORIA
 ========================= */
 
-const randomBtn = document.getElementById("random-movie-btn");
-const randomResult = document.getElementById("random-result");
-
 randomBtn.addEventListener("click", () => {
-    const movies = [];
-
-    document.querySelectorAll("article h3").forEach(movie => {
-        movies.push(movie.textContent);
-    });
+    const movies = getMovieTitles();
 
     if (movies.length === 0) {
         randomResult.textContent = "No hay películas en la lista.";
@@ -145,22 +186,17 @@ randomBtn.addEventListener("click", () => {
     }
 
     const randomIndex = Math.floor(Math.random() * movies.length);
-    randomResult.textContent = "🎬 Hoy toca ver: " + movies[randomIndex];
-    randomResult.classList.remove("random-appear");
-    void randomResult.offsetWidth;
-    randomResult.classList.add("random-appear");
+    showRandomMovie(movies[randomIndex]);
 });
 
 /* =========================
    BUSCAR PELÍCULAS
 ========================= */
 
-const searchInput = document.getElementById("search-input");
-
 searchInput.addEventListener("input", () => {
     const searchText = searchInput.value.toLowerCase();
 
-    document.querySelectorAll("article").forEach(card => {
+    taskList.querySelectorAll("article").forEach(card => {
         const title = card.querySelector("h3").textContent.toLowerCase();
         card.style.display = title.includes(searchText) ? "flex" : "none";
     });
@@ -178,6 +214,11 @@ document.getElementById("theme-toggle").addEventListener("click", () => {
    COLORES DE PRIORIDAD
 ========================= */
 
+/**
+ * Devuelve el color CSS según la prioridad de la película.
+ * @param {string} priority
+ * @returns {string}
+ */
 function getPriorityColor(priority) {
     if (priority === "high") return "bg-red-700 dark:bg-red-600";
     if (priority === "medium") return "bg-yellow-600 dark:bg-yellow-500";

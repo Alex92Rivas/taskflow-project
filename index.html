@@ -2,6 +2,7 @@
 <html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MovieNight Planner</title>
 
   <!-- TAILWIND CDN -->
@@ -17,7 +18,6 @@
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* CAMPOS DEL FORMULARIO: forzar colores */
     html.dark #search-input,
     html.dark #task-input,
     html.dark #category-select,
@@ -55,11 +55,11 @@
 <body class="bg-gradient-to-r from-black to-red-900 text-gray-100 min-h-screen">
 
   <!-- HEADER -->
-  <header class="bg-gray-800/80 backdrop-blur-sm text-red-400 p-4 shadow-lg mb-6 rounded">
-    <div class="container mx-auto flex items-center justify-between">
+  <header class="bg-gray-800/80 backdrop-blur-sm text-red-400 p-4 shadow-lg mb-4">
+    <div class="w-full px-4 md:px-6 lg:px-8 flex items-center justify-between">
       <div class="w-12"></div>
 
-      <h1 class="text-4xl tracking-widest text-center flex-1 font-bold" style="font-family: 'Bebas Neue', sans-serif;">
+      <h1 class="text-3xl md:text-4xl tracking-widest text-center flex-1 font-bold" style="font-family: 'Bebas Neue', sans-serif;">
         🎬 MovieNight Planner
       </h1>
 
@@ -75,110 +75,109 @@
   </header>
 
   <!-- CONTENEDOR PRINCIPAL -->
-  <div class="container mx-auto flex gap-6 px-4">
+  <div class="w-full px-4 md:px-6 lg:px-8 pb-6">
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
 
-    <!-- ASIDE -->
-    <aside class="w-64 bg-gray-800 text-gray-100 p-4 rounded shadow-lg border-r border-gray-700">
-      <h2 class="text-xl font-bold text-indigo-400 border-b border-gray-600 pb-2 mb-4">
-        Géneros
-      </h2>
+      <!-- ASIDE -->
+      <aside class="w-full lg:w-64 shrink-0 bg-gray-800 text-gray-100 p-4 rounded shadow-lg border-r border-gray-700">
+        <h2 class="text-xl font-bold text-indigo-400 border-b border-gray-600 pb-2 mb-4">
+          Géneros
+        </h2>
 
-      <ul class="space-y-2">
-        <li data-category="Todas" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Todas</li>
-        <li data-category="Acción" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Acción</li>
-        <li data-category="Comedia" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Comedia</li>
-        <li data-category="Drama" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Drama</li>
-        <li data-category="Terror" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Terror</li>
-        <li data-category="Ciencia Ficción" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Ciencia Ficción</li>
-        <li data-category="Fantasía" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Fantasía</li>
-        <li data-category="Romance" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Romance</li>
-        <li data-category="Documental" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Documental</li>
-        <li data-category="Musical" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Musical</li>
-      </ul>
-    </aside>
+        <ul class="space-y-2">
+          <li data-category="Todas" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Todas</li>
+          <li data-category="Acción" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Acción</li>
+          <li data-category="Comedia" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Comedia</li>
+          <li data-category="Drama" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Drama</li>
+          <li data-category="Terror" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Terror</li>
+          <li data-category="Ciencia Ficción" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Ciencia Ficción</li>
+          <li data-category="Fantasía" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Fantasía</li>
+          <li data-category="Romance" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Romance</li>
+          <li data-category="Documental" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Documental</li>
+          <li data-category="Musical" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Musical</li>
+        </ul>
+      </aside>
 
-    <!-- MAIN -->
-    <main class="flex-1 space-y-4 bg-gray-800 p-4 rounded shadow">
-
-      <!-- BUSCADOR -->
-      <input 
-        type="text" 
-        id="search-input" 
-        placeholder="Buscar película..."
-        class="w-full p-2 rounded bg-gray-700 focus:ring focus:ring-yellow-400 focus:outline-none transition"
-      >
-
-      <!-- FORMULARIO -->
-      <form id="task-form" class="flex gap-2 flex-wrap">
-
+      <!-- MAIN -->
+      <main class="flex-1 w-full space-y-4 bg-gray-800 p-4 rounded shadow min-h-[70vh]">
+        
+        <!-- BUSCADOR -->
         <input 
           type="text" 
-          id="task-input" 
-          placeholder="Añadir nueva película..." 
-          required
-          class="flex-1 p-2 rounded bg-gray-700 focus:ring focus:ring-blue-400 focus:outline-none transition"
+          id="search-input" 
+          placeholder="Buscar película..."
+          class="w-full p-3 rounded bg-gray-700 focus:ring focus:ring-yellow-400 focus:outline-none transition text-base"
         >
 
-        <select 
-          id="category-select"
-          class="p-2 rounded bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400 transition"
-        >
-          <option value="Acción">Acción</option>
-          <option value="Comedia">Comedia</option>
-          <option value="Drama">Drama</option>
-          <option value="Terror">Terror</option>
-          <option value="Ciencia Ficción">Ciencia Ficción</option>
-          <option value="Fantasía">Fantasía</option>
-          <option value="Romance">Romance</option>
-          <option value="Documental">Documental</option>
-          <option value="Musical">Musical</option>
-        </select>
+        <!-- FORMULARIO -->
+        <form id="task-form" class="flex flex-col md:flex-row gap-2 md:items-stretch">
 
-        <select 
-          id="priority-select"
-          class="p-2 rounded bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400 transition"
-        >
-          <option value="high">Alta</option>
-          <option value="medium" selected>Media</option>
-          <option value="low">Baja</option>
-        </select>
+          <input 
+            type="text" 
+            id="task-input" 
+            placeholder="Añadir nueva película..." 
+            required
+            class="flex-1 p-3 rounded bg-gray-700 focus:ring focus:ring-blue-400 focus:outline-none transition text-base"
+          >
 
-        <button 
-          type="submit"
-          class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
-        >
-          Añadir
-        </button>
-      </form>
+          <select 
+            id="category-select"
+            class="p-3 rounded bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
+          >
+            <option value="Acción">Acción</option>
+            <option value="Comedia">Comedia</option>
+            <option value="Drama">Drama</option>
+            <option value="Terror">Terror</option>
+            <option value="Ciencia Ficción">Ciencia Ficción</option>
+            <option value="Fantasía">Fantasía</option>
+            <option value="Romance">Romance</option>
+            <option value="Documental">Documental</option>
+            <option value="Musical">Musical</option>
+          </select>
 
-      <!-- BOTONES DE ACCIÓN -->
-      <div class="flex gap-2 flex-wrap">
-        <button 
-          id="random-movie-btn"
-          class="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
-        >
-          🎬 Peli para esta noche
-        </button>
+          <select 
+            id="priority-select"
+            class="p-3 rounded bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
+          >
+            <option value="high">Alta</option>
+            <option value="medium" selected>Media</option>
+            <option value="low">Baja</option>
+          </select>
 
-        <button 
-          id="sort-movies-btn"
-          class="px-4 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-600 transition"
-        >
-          Ordenar películas
-        </button>
-      </div>
+          <button 
+            type="submit"
+            class="px-4 py-3 bg-blue-700 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
+          >
+            Añadir
+          </button>
+        </form>
 
-      <!-- RESULTADO ALEATORIO -->
-      <p id="random-result" class="text-yellow-400 text-xl font-bold mt-3"></p>
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="flex flex-wrap gap-2">
+          <button 
+            id="random-movie-btn"
+            class="px-4 py-3 bg-purple-700 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
+          >
+            🎬 Peli para esta noche
+          </button>
 
-      <!-- LISTA DE TAREAS -->
-      <section class="task-list space-y-4"></section>
+          <button 
+            id="sort-movies-btn"
+            class="px-4 py-3 bg-indigo-700 text-white rounded hover:bg-indigo-600 transition"
+          >
+            Ordenar películas
+          </button>
+        </div>
 
-    </main>
+        <!-- RESULTADO -->
+        <p id="random-result" class="text-yellow-400 text-xl font-bold mt-3"></p>
 
+        <!-- LISTA -->
+        <section class="task-list space-y-4"></section>
+      </main>
+    </div>
   </div>
 
   <script src="app.js"></script>
-
 </body>
 </html>

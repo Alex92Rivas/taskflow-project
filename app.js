@@ -5,16 +5,17 @@ const randomBtn = document.getElementById("random-movie-btn");
 const randomResult = document.getElementById("random-result");
 const searchInput = document.getElementById("search-input");
 const sortBtn = document.getElementById("sort-movies-btn");
+const categoryFilters = document.querySelectorAll(".category-filter");
 
 /* =========================
    PELÍCULAS INICIALES
 ========================= */
 
 const defaultTasks = [
-  { title: "El Caballero Oscuro", category: "Acción", priority: "high", label: "Top" },
-  { title: "Superbad", category: "Comedia", priority: "low", label: "Ligera" },
-  { title: "Interstellar", category: "Ciencia Ficción", priority: "high", label: "Top" },
-  { title: "La La Land", category: "Drama", priority: "medium", label: "Interesante" }
+  { title: "El Caballero Oscuro", category: "Acción", priority: "high", label: "Top", watched: false },
+  { title: "Superbad", category: "Comedia", priority: "low", label: "Ligera", watched: false },
+  { title: "Interstellar", category: "Ciencia Ficción", priority: "high", label: "Top", watched: false },
+  { title: "La La Land", category: "Drama", priority: "medium", label: "Interesante", watched: false }
 ];
 
 /* =========================
@@ -36,9 +37,6 @@ function getStoredTasks() {
   return Array.isArray(storedTasks) ? storedTasks : [];
 }
 
-/**
- * Obtiene los títulos de todas las películas
- */
 function getMovieTitles() {
   const movies = [];
 
@@ -49,9 +47,6 @@ function getMovieTitles() {
   return movies;
 }
 
-/**
- * Muestra película aleatoria
- */
 function showRandomMovie(movieTitle) {
   randomResult.textContent = `🎬 Hoy toca ver: ${movieTitle}`;
   randomResult.classList.remove("random-appear");
@@ -70,6 +65,7 @@ function createTaskCard(task) {
   taskCard.dataset.category = task.category;
   taskCard.dataset.priority = task.priority;
   taskCard.dataset.label = task.label;
+  taskCard.dataset.watched = task.watched ? "true" : "false";
 
   taskCard.className =
     "relative z-0 flex justify-between items-center bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1";
@@ -90,7 +86,10 @@ function createTaskCard(task) {
           ⋮
         </button>
 
-        <div class="menu-dropdown hidden absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded shadow-lg border border-gray-200 dark:border-gray-700 z-10">
+        <div class="menu-dropdown hidden absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded shadow-lg border border-gray-200 dark:border-gray-700 z-10">
+          <button class="watch-btn block w-full text-left px-4 py-2 text-sm text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            ${task.watched ? "Marcar como pendiente" : "Marcar como vista"}
+          </button>
           <button class="edit-btn block w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition">
             Editar
           </button>
@@ -104,8 +103,15 @@ function createTaskCard(task) {
 
   const menuBtn = taskCard.querySelector(".menu-btn");
   const dropdown = taskCard.querySelector(".menu-dropdown");
+  const watchBtn = taskCard.querySelector(".watch-btn");
   const editBtn = taskCard.querySelector(".edit-btn");
   const deleteBtn = taskCard.querySelector(".delete-btn");
+  const titleElement = taskCard.querySelector("h3");
+
+  if (task.watched) {
+    taskCard.classList.add("opacity-60");
+    titleElement.classList.add("line-through");
+  }
 
   menuBtn.addEventListener("click", event => {
     event.stopPropagation();
@@ -128,12 +134,36 @@ function createTaskCard(task) {
     }
   });
 
+  watchBtn.addEventListener("click", () => {
+    const isWatched = taskCard.dataset.watched === "true";
+    const newWatchedState = !isWatched;
+
+    taskCard.dataset.watched = newWatchedState ? "true" : "false";
+
+    if (newWatchedState) {
+      taskCard.classList.add("opacity-60");
+      titleElement.classList.add("line-through");
+      watchBtn.textContent = "Marcar como pendiente";
+    } else {
+      taskCard.classList.remove("opacity-60");
+      titleElement.classList.remove("line-through");
+      watchBtn.textContent = "Marcar como vista";
+    }
+
+    dropdown.classList.add("hidden");
+    taskCard.classList.remove("z-20");
+    taskCard.classList.add("z-0");
+    saveTasks();
+  });
+
   editBtn.addEventListener("click", () => {
     const currentTitle = taskCard.dataset.title;
     const newTitle = prompt("Editar título de la película:", currentTitle);
 
     if (!newTitle) {
       dropdown.classList.add("hidden");
+      taskCard.classList.remove("z-20");
+      taskCard.classList.add("z-0");
       return;
     }
 
@@ -145,8 +175,10 @@ function createTaskCard(task) {
     }
 
     taskCard.dataset.title = trimmedTitle;
-    taskCard.querySelector("h3").textContent = trimmedTitle;
+    titleElement.textContent = trimmedTitle;
     dropdown.classList.add("hidden");
+    taskCard.classList.remove("z-20");
+    taskCard.classList.add("z-0");
     saveTasks();
   });
 
@@ -170,7 +202,8 @@ function saveTasks() {
       title: card.dataset.title || "",
       category: card.dataset.category || "",
       priority: card.dataset.priority || "low",
-      label: card.dataset.label || "Ligera"
+      label: card.dataset.label || "Ligera",
+      watched: card.dataset.watched === "true"
     });
   });
 
@@ -197,7 +230,8 @@ form.addEventListener("submit", event => {
     title: taskName,
     category,
     priority,
-    label: getPriorityLabel(priority)
+    label: getPriorityLabel(priority),
+    watched: false
   };
 
   createTaskCard(newTask);
@@ -227,7 +261,8 @@ document.addEventListener("DOMContentLoaded", () => {
       title: task.title,
       category: task.category,
       priority: normalizedPriority,
-      label: getPriorityLabel(normalizedPriority)
+      label: getPriorityLabel(normalizedPriority),
+      watched: task.watched || false
     };
   });
 
@@ -236,6 +271,10 @@ document.addEventListener("DOMContentLoaded", () => {
   taskList.innerHTML = "";
   storedTasks.forEach(task => createTaskCard(task));
 });
+
+/* =========================
+   CERRAR MENÚS
+========================= */
 
 document.addEventListener("click", () => {
   document.querySelectorAll(".menu-dropdown").forEach(menu => {
@@ -291,6 +330,26 @@ searchInput.addEventListener("input", () => {
   taskList.querySelectorAll("article").forEach(card => {
     const title = card.querySelector("h3").textContent.toLowerCase();
     card.style.display = title.includes(searchText) ? "flex" : "none";
+  });
+});
+
+/* =========================
+   FILTRAR POR GÉNERO
+========================= */
+
+categoryFilters.forEach(filter => {
+  filter.addEventListener("click", () => {
+    const selectedCategory = filter.dataset.category;
+
+    taskList.querySelectorAll("article").forEach(card => {
+      const category = card.dataset.category;
+
+      if (selectedCategory === "Todas" || category === selectedCategory) {
+        card.style.display = "flex";
+      } else {
+        card.style.display = "none";
+      }
+    });
   });
 });
 

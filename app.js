@@ -13,7 +13,7 @@ const sortBtn = document.getElementById("sort-movies-btn");
 const defaultTasks = [
   { title: "El Caballero Oscuro", category: "Acción", priority: "high", label: "Top" },
   { title: "Superbad", category: "Comedia", priority: "low", label: "Ligera" },
-  { title: "Interstellar", category: "Ciencia Ficción", priority: "high", label: "Imprescindible" },
+  { title: "Interstellar", category: "Ciencia Ficción", priority: "high", label: "Top" },
   { title: "La La Land", category: "Drama", priority: "medium", label: "Interesante" }
 ];
 
@@ -72,26 +72,85 @@ function createTaskCard(task) {
   taskCard.dataset.label = task.label;
 
   taskCard.className =
-    "flex justify-between items-center bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1";
+    "relative z-0 flex justify-between items-center bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1";
 
   taskCard.innerHTML = `
     <div class="flex flex-col">
-        <h3 class="text-lg font-bold text-blue-900 dark:text-gray-100">${task.title}</h3>
-        <span class="text-sm text-blue-700 dark:text-gray-300">${task.category}</span>
+      <h3 class="text-lg font-bold text-blue-900 dark:text-gray-100">${task.title}</h3>
+      <span class="text-sm text-blue-700 dark:text-gray-300">${task.category}</span>
     </div>
 
-    <div class="flex items-center gap-2">
-        <span class="px-2 py-1 rounded text-white ${getPriorityColor(task.priority)}">
-            ${task.label}
-        </span>
+    <div class="flex items-center gap-3 relative">
+      <span class="px-2 py-1 rounded text-white ${getPriorityColor(task.priority)}">
+        ${task.label}
+      </span>
 
-        <button class="delete-btn bg-red-600 text-white px-2 py-1 rounded hover:bg-red-500 transition">
-            Eliminar
+      <div class="relative">
+        <button class="menu-btn bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-600 transition">
+          ⋮
         </button>
+
+        <div class="menu-dropdown hidden absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded shadow-lg border border-gray-200 dark:border-gray-700 z-10">
+          <button class="edit-btn block w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            Editar
+          </button>
+          <button class="delete-btn block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            Eliminar
+          </button>
+        </div>
+      </div>
     </div>
   `;
 
-  taskCard.querySelector(".delete-btn").addEventListener("click", () => {
+  const menuBtn = taskCard.querySelector(".menu-btn");
+  const dropdown = taskCard.querySelector(".menu-dropdown");
+  const editBtn = taskCard.querySelector(".edit-btn");
+  const deleteBtn = taskCard.querySelector(".delete-btn");
+
+  menuBtn.addEventListener("click", event => {
+    event.stopPropagation();
+
+    const isOpen = !dropdown.classList.contains("hidden");
+
+    document.querySelectorAll(".menu-dropdown").forEach(menu => {
+      menu.classList.add("hidden");
+    });
+
+    document.querySelectorAll(".task-list article").forEach(card => {
+      card.classList.remove("z-20");
+      card.classList.add("z-0");
+    });
+
+    if (!isOpen) {
+      dropdown.classList.remove("hidden");
+      taskCard.classList.remove("z-0");
+      taskCard.classList.add("z-20");
+    }
+  });
+
+  editBtn.addEventListener("click", () => {
+    const currentTitle = taskCard.dataset.title;
+    const newTitle = prompt("Editar título de la película:", currentTitle);
+
+    if (!newTitle) {
+      dropdown.classList.add("hidden");
+      return;
+    }
+
+    const trimmedTitle = newTitle.trim();
+
+    if (!isValidTaskTitle(trimmedTitle)) {
+      alert("Introduce un título válido de al menos 2 caracteres.");
+      return;
+    }
+
+    taskCard.dataset.title = trimmedTitle;
+    taskCard.querySelector("h3").textContent = trimmedTitle;
+    dropdown.classList.add("hidden");
+    saveTasks();
+  });
+
+  deleteBtn.addEventListener("click", () => {
     taskCard.remove();
     saveTasks();
   });
@@ -155,10 +214,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (storedTasks.length === 0) {
     storedTasks = defaultTasks;
-    localStorage.setItem("tasks", JSON.stringify(defaultTasks));
   }
 
+  storedTasks = storedTasks.map(task => {
+    let normalizedPriority = task.priority;
+
+    if (task.label === "Top") normalizedPriority = "high";
+    if (task.label === "Interesante") normalizedPriority = "medium";
+    if (task.label === "Ligera") normalizedPriority = "low";
+
+    return {
+      title: task.title,
+      category: task.category,
+      priority: normalizedPriority,
+      label: getPriorityLabel(normalizedPriority)
+    };
+  });
+
+  localStorage.setItem("tasks", JSON.stringify(storedTasks));
+
+  taskList.innerHTML = "";
   storedTasks.forEach(task => createTaskCard(task));
+});
+
+document.addEventListener("click", () => {
+  document.querySelectorAll(".menu-dropdown").forEach(menu => {
+    menu.classList.add("hidden");
+  });
+
+  document.querySelectorAll(".task-list article").forEach(card => {
+    card.classList.remove("z-20");
+    card.classList.add("z-0");
+  });
 });
 
 /* =========================
@@ -182,17 +269,17 @@ randomBtn.addEventListener("click", () => {
 ========================= */
 
 sortBtn.addEventListener("click", () => {
-    const cards = Array.from(taskList.querySelectorAll("article"));
-  
-    cards.sort((a, b) => {
-      const titleA = a.querySelector("h3").textContent.toLowerCase();
-      const titleB = b.querySelector("h3").textContent.toLowerCase();
-      return titleA.localeCompare(titleB);
-    });
-  
-    cards.forEach(card => taskList.appendChild(card));
-    saveTasks();
+  const cards = Array.from(taskList.querySelectorAll("article"));
+
+  cards.sort((a, b) => {
+    const titleA = a.querySelector("h3").textContent.toLowerCase();
+    const titleB = b.querySelector("h3").textContent.toLowerCase();
+    return titleA.localeCompare(titleB);
   });
+
+  cards.forEach(card => taskList.appendChild(card));
+  saveTasks();
+});
 
 /* =========================
    BUSCAR PELÍCULAS
@@ -220,7 +307,7 @@ document.getElementById("theme-toggle").addEventListener("click", () => {
 ========================= */
 
 function getPriorityColor(priority) {
-  if (priority === "high") return "bg-red-700 dark:bg-red-600";
-  if (priority === "medium") return "bg-yellow-600 dark:bg-yellow-500";
-  return "bg-green-700 dark:bg-green-600";
+  if (priority === "high") return "bg-red-600 dark:bg-red-500";
+  if (priority === "medium") return "bg-sky-500 dark:bg-sky-400";
+  return "bg-green-600 dark:bg-green-500";
 }

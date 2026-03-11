@@ -140,13 +140,22 @@
         </button>
       </form>
 
-      <!-- BOTÓN ALEATORIO -->
-      <button 
-        id="random-movie-btn"
-        class="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
-      >
-        🎬 Peli para esta noche
-      </button>
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="flex gap-2 flex-wrap">
+        <button 
+          id="random-movie-btn"
+          class="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
+        >
+          🎬 Peli para esta noche
+        </button>
+
+        <button 
+          id="sort-movies-btn"
+          class="px-4 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-600 transition"
+        >
+          Ordenar películas
+        </button>
+      </div>
 
       <!-- RESULTADO ALEATORIO -->
       <p id="random-result" class="text-yellow-400 text-xl font-bold mt-3"></p>

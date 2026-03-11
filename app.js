@@ -4,16 +4,17 @@ const taskList = document.querySelector(".task-list");
 const randomBtn = document.getElementById("random-movie-btn");
 const randomResult = document.getElementById("random-result");
 const searchInput = document.getElementById("search-input");
+const sortBtn = document.getElementById("sort-movies-btn");
 
 /* =========================
    PELÍCULAS INICIALES
 ========================= */
 
 const defaultTasks = [
-    { title: "El Caballero Oscuro", category: "Acción", priority: "high", label: "Top" },
-    { title: "Superbad", category: "Comedia", priority: "low", label: "Ligera" },
-    { title: "Interstellar", category: "Ciencia Ficción", priority: "high", label: "Imprescindible" },
-    { title: "La La Land", category: "Drama", priority: "medium", label: "Interesante" }
+  { title: "El Caballero Oscuro", category: "Acción", priority: "high", label: "Top" },
+  { title: "Superbad", category: "Comedia", priority: "low", label: "Ligera" },
+  { title: "Interstellar", category: "Ciencia Ficción", priority: "high", label: "Imprescindible" },
+  { title: "La La Land", category: "Drama", priority: "medium", label: "Interesante" }
 ];
 
 /* =========================
@@ -21,113 +22,100 @@ const defaultTasks = [
 ========================= */
 
 function getPriorityLabel(priority) {
-    if (priority === "high") return "Top";
-    if (priority === "medium") return "Interesante";
-    return "Ligera";
+  if (priority === "high") return "Top";
+  if (priority === "medium") return "Interesante";
+  return "Ligera";
 }
 
 function isValidTaskTitle(title) {
-    return title.trim().length >= 2;
+  return title.trim().length >= 2;
 }
 
 function getStoredTasks() {
-    const storedTasks = JSON.parse(localStorage.getItem("tasks"));
-    return Array.isArray(storedTasks) ? storedTasks : [];
+  const storedTasks = JSON.parse(localStorage.getItem("tasks"));
+  return Array.isArray(storedTasks) ? storedTasks : [];
 }
 
 /**
- * Obtiene los títulos de todas las películas de la lista.
- * @returns {string[]}
+ * Obtiene los títulos de todas las películas
  */
 function getMovieTitles() {
-    const movies = [];
+  const movies = [];
 
-    taskList.querySelectorAll("article h3").forEach(movie => {
-        movies.push(movie.textContent);
-    });
+  taskList.querySelectorAll("article h3").forEach(movie => {
+    movies.push(movie.textContent);
+  });
 
-    return movies;
+  return movies;
 }
 
 /**
- * Muestra una película aleatoria en pantalla.
- * @param {string} movieTitle
+ * Muestra película aleatoria
  */
 function showRandomMovie(movieTitle) {
-    randomResult.textContent = `🎬 Hoy toca ver: ${movieTitle}`;
-    randomResult.classList.remove("random-appear");
-    void randomResult.offsetWidth;
-    randomResult.classList.add("random-appear");
+  randomResult.textContent = `🎬 Hoy toca ver: ${movieTitle}`;
+  randomResult.classList.remove("random-appear");
+  void randomResult.offsetWidth;
+  randomResult.classList.add("random-appear");
 }
 
 /* =========================
    CREAR TARJETA
 ========================= */
 
-/**
- * Crea una tarjeta de película en la lista.
- * @param {Object} task
- * @param {string} task.title
- * @param {string} task.category
- * @param {string} task.priority
- * @param {string} task.label
- */
 function createTaskCard(task) {
-    const taskCard = document.createElement("article");
+  const taskCard = document.createElement("article");
 
-    taskCard.dataset.title = task.title;
-    taskCard.dataset.category = task.category;
-    taskCard.dataset.priority = task.priority;
-    taskCard.dataset.label = task.label;
+  taskCard.dataset.title = task.title;
+  taskCard.dataset.category = task.category;
+  taskCard.dataset.priority = task.priority;
+  taskCard.dataset.label = task.label;
 
-    taskCard.className =
-        "flex justify-between items-center bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1";
+  taskCard.className =
+    "flex justify-between items-center bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm p-4 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1";
 
-    taskCard.innerHTML = `
-        <div class="flex flex-col">
-            <h3 class="text-lg font-bold text-blue-900 dark:text-gray-100">${task.title}</h3>
-            <span class="text-sm text-blue-700 dark:text-gray-300">${task.category}</span>
-        </div>
+  taskCard.innerHTML = `
+    <div class="flex flex-col">
+        <h3 class="text-lg font-bold text-blue-900 dark:text-gray-100">${task.title}</h3>
+        <span class="text-sm text-blue-700 dark:text-gray-300">${task.category}</span>
+    </div>
 
-        <div class="flex items-center gap-2">
-            <span class="px-2 py-1 rounded text-white ${getPriorityColor(task.priority)}">
-                ${task.label}
-            </span>
+    <div class="flex items-center gap-2">
+        <span class="px-2 py-1 rounded text-white ${getPriorityColor(task.priority)}">
+            ${task.label}
+        </span>
 
-            <button class="delete-btn bg-red-600 text-white px-2 py-1 rounded hover:bg-red-500 transition">
-                Eliminar
-            </button>
-        </div>
-    `;
+        <button class="delete-btn bg-red-600 text-white px-2 py-1 rounded hover:bg-red-500 transition">
+            Eliminar
+        </button>
+    </div>
+  `;
 
-    taskCard.querySelector(".delete-btn").addEventListener("click", () => {
-        taskCard.remove();
-        saveTasks();
-    });
+  taskCard.querySelector(".delete-btn").addEventListener("click", () => {
+    taskCard.remove();
+    saveTasks();
+  });
 
-    taskList.appendChild(taskCard);
+  taskList.appendChild(taskCard);
 }
 
 /* =========================
    GUARDAR EN LOCALSTORAGE
 ========================= */
 
-/**
- * Guarda las películas actuales en localStorage.
- */
 function saveTasks() {
-    const tasks = [];
+  const tasks = [];
 
-    taskList.querySelectorAll("article").forEach(card => {
-        tasks.push({
-            title: card.dataset.title || "",
-            category: card.dataset.category || "",
-            priority: card.dataset.priority || "low",
-            label: card.dataset.label || "Ligera"
-        });
+  taskList.querySelectorAll("article").forEach(card => {
+    tasks.push({
+      title: card.dataset.title || "",
+      category: card.dataset.category || "",
+      priority: card.dataset.priority || "low",
+      label: card.dataset.label || "Ligera"
     });
+  });
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 /* =========================
@@ -135,27 +123,27 @@ function saveTasks() {
 ========================= */
 
 form.addEventListener("submit", event => {
-    event.preventDefault();
+  event.preventDefault();
 
-    const taskName = input.value.trim();
-    const category = document.getElementById("category-select").value;
-    const priority = document.getElementById("priority-select").value;
+  const taskName = input.value.trim();
+  const category = document.getElementById("category-select").value;
+  const priority = document.getElementById("priority-select").value;
 
-    if (!isValidTaskTitle(taskName)) {
-        alert("Introduce un título válido de al menos 2 caracteres.");
-        return;
-    }
+  if (!isValidTaskTitle(taskName)) {
+    alert("Introduce un título válido de al menos 2 caracteres.");
+    return;
+  }
 
-    const newTask = {
-        title: taskName,
-        category,
-        priority,
-        label: getPriorityLabel(priority)
-    };
+  const newTask = {
+    title: taskName,
+    category,
+    priority,
+    label: getPriorityLabel(priority)
+  };
 
-    createTaskCard(newTask);
-    saveTasks();
-    form.reset();
+  createTaskCard(newTask);
+  saveTasks();
+  form.reset();
 });
 
 /* =========================
@@ -163,30 +151,46 @@ form.addEventListener("submit", event => {
 ========================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-    let storedTasks = getStoredTasks();
+  let storedTasks = getStoredTasks();
 
-    if (storedTasks.length === 0) {
-        storedTasks = defaultTasks;
-        localStorage.setItem("tasks", JSON.stringify(defaultTasks));
-    }
+  if (storedTasks.length === 0) {
+    storedTasks = defaultTasks;
+    localStorage.setItem("tasks", JSON.stringify(defaultTasks));
+  }
 
-    storedTasks.forEach(task => createTaskCard(task));
+  storedTasks.forEach(task => createTaskCard(task));
 });
 
 /* =========================
-   ELEGIR PELÍCULA ALEATORIA
+   PELÍCULA ALEATORIA
 ========================= */
 
 randomBtn.addEventListener("click", () => {
-    const movies = getMovieTitles();
+  const movies = getMovieTitles();
 
-    if (movies.length === 0) {
-        randomResult.textContent = "No hay películas en la lista.";
-        return;
-    }
+  if (movies.length === 0) {
+    randomResult.textContent = "No hay películas en la lista.";
+    return;
+  }
 
-    const randomIndex = Math.floor(Math.random() * movies.length);
-    showRandomMovie(movies[randomIndex]);
+  const randomIndex = Math.floor(Math.random() * movies.length);
+  showRandomMovie(movies[randomIndex]);
+});
+
+/* =========================
+   ORDENAR PELÍCULAS
+========================= */
+
+sortBtn.addEventListener("click", () => {
+  const cards = Array.from(taskList.querySelectorAll("article"));
+
+  cards.sort((a, b) => {
+    const titleA = a.querySelector("h3").textContent.toLowerCase();
+    const titleB = b.querySelector("h3").textContent.toLowerCase();
+    return titleA.localeCompare(titleB);
+  });
+
+  cards.forEach(card => taskList.appendChild(card));
 });
 
 /* =========================
@@ -194,12 +198,12 @@ randomBtn.addEventListener("click", () => {
 ========================= */
 
 searchInput.addEventListener("input", () => {
-    const searchText = searchInput.value.toLowerCase();
+  const searchText = searchInput.value.toLowerCase();
 
-    taskList.querySelectorAll("article").forEach(card => {
-        const title = card.querySelector("h3").textContent.toLowerCase();
-        card.style.display = title.includes(searchText) ? "flex" : "none";
-    });
+  taskList.querySelectorAll("article").forEach(card => {
+    const title = card.querySelector("h3").textContent.toLowerCase();
+    card.style.display = title.includes(searchText) ? "flex" : "none";
+  });
 });
 
 /* =========================
@@ -207,20 +211,15 @@ searchInput.addEventListener("input", () => {
 ========================= */
 
 document.getElementById("theme-toggle").addEventListener("click", () => {
-    document.documentElement.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark");
 });
 
 /* =========================
    COLORES DE PRIORIDAD
 ========================= */
 
-/**
- * Devuelve el color CSS según la prioridad de la película.
- * @param {string} priority
- * @returns {string}
- */
 function getPriorityColor(priority) {
-    if (priority === "high") return "bg-red-700 dark:bg-red-600";
-    if (priority === "medium") return "bg-yellow-600 dark:bg-yellow-500";
-    return "bg-green-700 dark:bg-green-600";
+  if (priority === "high") return "bg-red-700 dark:bg-red-600";
+  if (priority === "medium") return "bg-yellow-600 dark:bg-yellow-500";
+  return "bg-green-700 dark:bg-green-600";
 }

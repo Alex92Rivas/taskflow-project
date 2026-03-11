@@ -182,16 +182,17 @@ randomBtn.addEventListener("click", () => {
 ========================= */
 
 sortBtn.addEventListener("click", () => {
-  const cards = Array.from(taskList.querySelectorAll("article"));
-
-  cards.sort((a, b) => {
-    const titleA = a.querySelector("h3").textContent.toLowerCase();
-    const titleB = b.querySelector("h3").textContent.toLowerCase();
-    return titleA.localeCompare(titleB);
+    const cards = Array.from(taskList.querySelectorAll("article"));
+  
+    cards.sort((a, b) => {
+      const titleA = a.querySelector("h3").textContent.toLowerCase();
+      const titleB = b.querySelector("h3").textContent.toLowerCase();
+      return titleA.localeCompare(titleB);
+    });
+  
+    cards.forEach(card => taskList.appendChild(card));
+    saveTasks();
   });
-
-  cards.forEach(card => taskList.appendChild(card));
-});
 
 /* =========================
    BUSCAR PELÍCULAS

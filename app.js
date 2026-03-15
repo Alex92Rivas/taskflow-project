@@ -105,6 +105,10 @@ function saveTasks() {
   localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
 }
 
+function saveTasksArray(tasks) {
+  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+}
+
 function getMovieTitles() {
   const movies = [];
 
@@ -189,15 +193,18 @@ function setTheme(theme) {
   } else {
     document.documentElement.classList.add("dark");
   }
+
   localStorage.setItem(THEME_STORAGE_KEY, theme);
 }
 
 function loadTheme() {
   const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+
   if (storedTheme === "light" || storedTheme === "dark") {
     setTheme(storedTheme);
     return;
   }
+
   setTheme("dark");
 }
 
@@ -232,6 +239,36 @@ async function fetchMovieImages(title) {
   }
 }
 
+async function hydrateTasksWithImages(tasks) {
+  let changed = false;
+
+  const updatedTasks = await Promise.all(
+    tasks.map(async task => {
+      if (task.poster || task.backdrop) {
+        return task;
+      }
+
+      const images = await fetchMovieImages(task.title);
+
+      if (images.poster || images.backdrop) {
+        changed = true;
+      }
+
+      return {
+        ...task,
+        poster: images.poster || "",
+        backdrop: images.backdrop || ""
+      };
+    })
+  );
+
+  if (changed) {
+    saveTasksArray(updatedTasks);
+  }
+
+  return updatedTasks;
+}
+
 /* =========================
    CREAR TARJETA
 ========================= */
@@ -254,30 +291,30 @@ function createTaskCard(task) {
 
   taskCard.innerHTML = `
     <div class="flex-1 min-w-0 flex">
-      <div class="movie-visual relative w-[320px] min-w-[320px] h-[150px] overflow-hidden rounded-l-xl">
+      <div class="movie-visual relative w-[385px] min-w-[385px] h-[150px] rounded-l-xl overflow-hidden shrink-0">
         <img
           src="${imageUrl}"
           alt="Imagen de ${escapeHtml(task.title)}"
           class="absolute inset-0 w-full h-full object-cover"
         />
 
-        <div class="absolute inset-0 bg-black/55"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20"></div>
+        <div class="absolute inset-0 bg-black/55 z-[1]"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/10 z-[1]"></div>
 
-        <div class="absolute inset-0 flex flex-col justify-start px-4 py-4">
-          <h3 class="movie-title text-xl font-extrabold text-white leading-tight max-w-[230px]">
+        <div class="absolute inset-0 flex flex-col justify-start px-4 py-4 z-[3]">
+          <h3 class="movie-title text-xl font-extrabold text-white leading-tight max-w-[250px]">
             ${escapeHtml(task.title)}
           </h3>
-          <span class="movie-category text-sm font-medium text-gray-200 mt-2 max-w-[230px]">
+          <span class="movie-category text-sm font-medium text-gray-200 mt-2 max-w-[250px]">
             ${escapeHtml(task.category)}
           </span>
         </div>
       </div>
 
-      <div class="flex-1 rounded-r-xl bg-white/85 dark:bg-gray-800/55"></div>
+      <div class="flex-1 min-w-0 rounded-r-xl bg-white/85 dark:bg-gray-800/55"></div>
     </div>
 
-    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-[4]">
       <span class="px-2 py-1 rounded text-white text-sm font-semibold ${getPriorityColor(task.priority)}">
         ${escapeHtml(task.label)}
       </span>
@@ -326,6 +363,10 @@ function createTaskCard(task) {
       taskCard.classList.remove("z-0");
       taskCard.classList.add("z-20");
     }
+  });
+
+  dropdown.addEventListener("click", event => {
+    event.stopPropagation();
   });
 
   watchBtn.addEventListener("click", () => {
@@ -427,7 +468,7 @@ form.addEventListener("submit", async event => {
    CARGAR AL INICIAR
 ========================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   loadTheme();
 
   let storedTasks = getStoredTasks();
@@ -454,10 +495,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   });
 
-  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(storedTasks));
+  saveTasksArray(storedTasks);
+
+  const hydratedTasks = await hydrateTasksWithImages(storedTasks);
 
   taskList.innerHTML = "";
-  storedTasks.forEach(task => createTaskCard(task));
+  hydratedTasks.forEach(task => createTaskCard(task));
   applyFilters();
 });
 

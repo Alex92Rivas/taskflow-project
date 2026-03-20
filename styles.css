@@ -18,84 +18,290 @@
 }
 
 /* =========================
-   COLOR INPUTS
+   AJUSTES GENERALES
 ========================= */
 
-html.dark input,
-html.dark select,
-html.dark option {
-  color: white;
+html,
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-html:not(.dark) input,
-html:not(.dark) select,
-html:not(.dark) option {
-  color: black;
-  background-color: white;
+body {
+  margin: 0;
+}
+
+/* =========================
+   CAMPOS DEL FORMULARIO
+========================= */
+
+html.dark #search-input,
+html.dark #task-input,
+html.dark #category-select,
+html.dark #priority-select {
+  background-color: #374151 !important;
+  color: white !important;
+  border: 1px solid transparent;
+}
+
+html.dark #search-input::placeholder,
+html.dark #task-input::placeholder {
+  color: #d1d5db !important;
+}
+
+html:not(.dark) #search-input,
+html:not(.dark) #task-input,
+html:not(.dark) #category-select,
+html:not(.dark) #priority-select {
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid #d1d5db;
+}
+
+html:not(.dark) #search-input::placeholder,
+html:not(.dark) #task-input::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Opciones del select */
+#category-select option,
+#priority-select option {
+  color: black !important;
+  background-color: white !important;
+}
+
+/* =========================
+   ESTRUCTURA PRINCIPAL EN MODO CLARO
+========================= */
+
+html:not(.dark) header {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #dc2626 !important;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+html:not(.dark) main {
+  background: #f9fafb !important;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+}
+
+html:not(.dark) #theme-toggle {
+  background: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+html:not(.dark) #theme-toggle:hover {
+  background: #d1d5db !important;
+}
+
+html:not(.dark) #random-result {
+  color: #b45309 !important;
+}
+
+html:not(.dark) #loading-state {
+  color: #2563eb !important;
+}
+
+html:not(.dark) #error-state {
+  color: #dc2626 !important;
+}
+
+html:not(.dark) #success-state {
+  color: #15803d !important;
+}
+
+/* =========================
+   SIDEBAR GÉNEROS - MODO OSCURO / CLARO
+========================= */
+
+.sidebar {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Modo oscuro */
+html.dark .sidebar {
+  background: #1e293b;
+  border-right: 1px solid #334155;
+}
+
+html.dark #toggle-genres {
+  color: #facc15;
+  border-bottom-color: #475569;
+}
+
+html.dark .sidebar ul li {
+  color: #facc15;
+}
+
+html.dark .sidebar ul li:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fde68a;
+}
+
+/* Modo claro */
+html:not(.dark) .sidebar {
+  background: #ffffff;
+  border-right: 1px solid #d1d5db;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+html:not(.dark) #toggle-genres {
+  color: #1f2937;
+  border-bottom-color: #d1d5db;
+}
+
+html:not(.dark) .sidebar ul li {
+  color: #374151;
+}
+
+html:not(.dark) .sidebar ul li:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* =========================
+   BOTÓN DESPLEGABLE DE GÉNEROS
+========================= */
+
+#toggle-genres {
+  background: transparent;
+  width: 100%;
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+#toggle-genres:focus {
+  outline: none;
+}
+
+#genre-arrow {
+  display: inline-block;
+  font-size: 0.85rem;
+  transition: transform 0.25s ease;
+}
+
+#genre-list {
+  transition: all 0.25s ease;
+}
+
+#genre-list.hidden {
+  display: none;
+}
+
+/* =========================
+   LISTA DE GÉNEROS
+========================= */
+
+.sidebar ul li {
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sidebar ul li:hover {
+  transform: translateX(2px);
 }
 
 /* =========================
    TARJETAS DE PELÍCULAS
 ========================= */
 
+.movie-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+}
+
+.movie-card img {
+  transition: transform 0.35s ease;
+}
+
+.movie-card:hover img {
+  transform: scale(1.03);
+}
+
 .movie-title,
 .movie-category {
-  text-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.98),
-    0 1px 3px rgba(0, 0, 0, 0.95);
-}
-
-.movie-card {
-  overflow: visible;
-}
-
-.movie-visual {
-  position: relative;
-  overflow: hidden;
-}
-
-.movie-visual img {
-  transform: scaleX(1.08) scaleY(1.03);
-  transform-origin: center;
-  will-change: transform;
+  word-break: break-word;
 }
 
 /* =========================
-   RESPONSIVE
+   PELÍCULA VISTA
 ========================= */
+
+.movie-card.opacity-60 {
+  position: relative;
+}
+
+.movie-card.opacity-60::after {
+  content: "Vista";
+  position: absolute;
+  left: 1rem;
+  bottom: 0.8rem;
+  background: rgba(22, 163, 74, 0.92);
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  z-index: 5;
+  letter-spacing: 0.02em;
+}
+
+/* =========================
+   BOTÓN RÁPIDO "VISTA"
+========================= */
+
+.quick-watch-btn {
+  min-width: 72px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.quick-watch-btn:focus {
+  outline: none;
+}
+
+/* =========================
+   MENÚ DESPLEGABLE DE CADA PELÍCULA
+========================= */
+
+.menu-dropdown {
+  overflow: hidden;
+}
+
+.menu-dropdown button {
+  cursor: pointer;
+}
+
+/* =========================
+   CONTADOR DE VISTAS
+========================= */
+
+#seen-counter {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* =========================
+   MEJORAS RESPONSIVE
+========================= */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 100%;
+  }
+}
 
 @media (max-width: 768px) {
   .movie-card {
-    min-height: auto;
+    min-height: 130px;
   }
+}
 
-  .movie-visual {
-    width: 100% !important;
-    min-width: 0 !important;
-    height: 170px !important;
-    border-radius: 0.75rem 0.75rem 0 0 !important;
-  }
-
-  .movie-card > div:first-child {
-    flex-direction: column;
-  }
-
-  .movie-card > div:first-child > div:last-child {
-    display: none;
-  }
-
-  .movie-card .absolute.right-4 {
-    top: auto;
-    bottom: 0.75rem;
-    transform: none;
-  }
-
-  .movie-title,
-  .movie-category {
-    max-width: calc(100% - 1rem) !important;
-  }
-
-  .movie-visual img {
-    transform: scaleX(1.04) scaleY(1.02);
+@media (max-width: 640px) {
+  #seen-counter {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0 !important;
   }
 }

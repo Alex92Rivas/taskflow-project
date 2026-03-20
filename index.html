@@ -1,73 +1,38 @@
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MovieNight Planner</title>
 
-  <!-- TAILWIND CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- ACTIVAR MODO OSCURO POR CLASE -->
   <script>
     tailwind.config = {
-      darkMode: "class"
-    }
+      darkMode: "class",
+    };
   </script>
 
-  <link rel="stylesheet" href="styles.css">
-
-  <style>
-    html.dark #search-input,
-    html.dark #task-input,
-    html.dark #category-select,
-    html.dark #priority-select {
-      background-color: #374151 !important;
-      color: white !important;
-    }
-
-    html.dark #search-input::placeholder,
-    html.dark #task-input::placeholder {
-      color: #d1d5db !important;
-    }
-
-    html:not(.dark) #search-input,
-    html:not(.dark) #task-input,
-    html:not(.dark) #category-select,
-    html:not(.dark) #priority-select {
-      background-color: white !important;
-      color: black !important;
-    }
-
-    html:not(.dark) #search-input::placeholder,
-    html:not(.dark) #task-input::placeholder {
-      color: #6b7280 !important;
-    }
-
-    #category-select option,
-    #priority-select option {
-      color: black !important;
-      background-color: white !important;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
-<body class="bg-gradient-to-r from-black to-red-900 text-gray-100 min-h-screen">
-
+<body class="bg-gradient-to-r from-black to-red-900 text-gray-100 min-h-screen transition-colors duration-300">
   <!-- HEADER -->
-  <header class="bg-gray-800/80 backdrop-blur-sm text-red-400 p-4 shadow-lg mb-4">
+  <header class="bg-gray-800/80 backdrop-blur-sm text-red-400 p-4 shadow-lg mb-4 transition-colors duration-300">
     <div class="w-full px-4 md:px-6 lg:px-8 flex items-center justify-between">
       <div class="w-12"></div>
 
-      <h1 class="text-3xl md:text-4xl tracking-widest text-center flex-1 font-bold" style="font-family: 'Bebas Neue', sans-serif;">
+      <h1
+        class="text-3xl md:text-4xl tracking-widest text-center flex-1 font-bold"
+        style="font-family: 'Bebas Neue', sans-serif;"
+      >
         🎬 MovieNight Planner
       </h1>
 
-      <button 
+      <button
         id="theme-toggle"
         class="w-12 h-12 flex items-center justify-center bg-gray-700 text-yellow-400 rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-300"
-        aria-label="Alternar modo de campos"
-        title="Alternar modo de campos"
+        aria-label="Alternar modo claro y oscuro"
+        title="Alternar modo claro y oscuro"
       >
         💡
       </button>
@@ -77,52 +42,57 @@
   <!-- CONTENEDOR PRINCIPAL -->
   <div class="w-full px-4 md:px-6 lg:px-8 pb-6">
     <div class="flex flex-col lg:flex-row gap-6 items-start">
-
       <!-- ASIDE -->
-      <aside class="w-full lg:w-64 shrink-0 bg-gray-800 text-gray-100 p-4 rounded shadow-lg border-r border-gray-700">
-        <h2 class="text-xl font-bold text-indigo-400 border-b border-gray-600 pb-2 mb-4">
-          Géneros
-        </h2>
+      <aside class="sidebar w-full lg:w-64 shrink-0 p-4 rounded shadow-lg transition-colors duration-300">
+        <button
+          id="toggle-genres"
+          type="button"
+          class="w-full flex items-center justify-between text-left text-xl font-bold pb-2 mb-4 border-b focus:outline-none"
+          aria-expanded="true"
+          aria-controls="genre-list"
+        >
+          <span>Géneros</span>
+          <span id="genre-arrow" class="text-sm">▼</span>
+        </button>
 
-        <ul class="space-y-2">
-          <li data-category="Todas" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Todas</li>
-          <li data-category="Acción" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Acción</li>
-          <li data-category="Comedia" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Comedia</li>
-          <li data-category="Drama" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Drama</li>
-          <li data-category="Terror" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Terror</li>
-          <li data-category="Ciencia Ficción" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Ciencia Ficción</li>
-          <li data-category="Fantasía" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Fantasía</li>
-          <li data-category="Romance" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Romance</li>
-          <li data-category="Documental" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Documental</li>
-          <li data-category="Musical" class="category-filter cursor-pointer text-yellow-300 hover:text-yellow-200 transition font-semibold">Musical</li>
+        <ul id="genre-list" class="space-y-2">
+          <li data-category="Todas" class="category-filter cursor-pointer font-semibold">Todas</li>
+          <li data-category="Acción" class="category-filter cursor-pointer font-semibold">Acción</li>
+          <li data-category="Comedia" class="category-filter cursor-pointer font-semibold">Comedia</li>
+          <li data-category="Drama" class="category-filter cursor-pointer font-semibold">Drama</li>
+          <li data-category="Terror" class="category-filter cursor-pointer font-semibold">Terror</li>
+          <li data-category="Ciencia Ficción" class="category-filter cursor-pointer font-semibold">Ciencia Ficción</li>
+          <li data-category="Fantasía" class="category-filter cursor-pointer font-semibold">Fantasía</li>
+          <li data-category="Romance" class="category-filter cursor-pointer font-semibold">Romance</li>
+          <li data-category="Documental" class="category-filter cursor-pointer font-semibold">Documental</li>
+          <li data-category="Musical" class="category-filter cursor-pointer font-semibold">Musical</li>
+          <li data-category="Serie" class="category-filter cursor-pointer font-semibold">Serie</li>
         </ul>
       </aside>
 
       <!-- MAIN -->
-      <main class="flex-1 w-full space-y-4 bg-gray-800 p-4 rounded shadow min-h-[70vh]">
-        
+      <main class="flex-1 w-full space-y-4 bg-gray-800/90 p-4 rounded shadow min-h-[70vh] transition-colors duration-300">
         <!-- BUSCADOR -->
-        <input 
-          type="text" 
-          id="search-input" 
+        <input
+          type="text"
+          id="search-input"
           placeholder="Buscar película..."
-          class="w-full p-3 rounded bg-gray-700 focus:ring focus:ring-yellow-400 focus:outline-none transition text-base"
-        >
+          class="w-full p-3 rounded focus:ring focus:ring-yellow-400 focus:outline-none transition text-base"
+        />
 
         <!-- FORMULARIO -->
         <form id="task-form" class="flex flex-col md:flex-row gap-2 md:items-stretch">
-
-          <input 
-            type="text" 
-            id="task-input" 
-            placeholder="Añadir nueva película..." 
+          <input
+            type="text"
+            id="task-input"
+            placeholder="Añadir nueva película..."
             required
-            class="flex-1 p-3 rounded bg-gray-700 focus:ring focus:ring-blue-400 focus:outline-none transition text-base"
-          >
+            class="flex-1 p-3 rounded focus:ring focus:ring-blue-400 focus:outline-none transition text-base"
+          />
 
-          <select 
+          <select
             id="category-select"
-            class="p-3 rounded bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
+            class="p-3 rounded focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
           >
             <option value="Acción">Acción</option>
             <option value="Comedia">Comedia</option>
@@ -133,18 +103,19 @@
             <option value="Romance">Romance</option>
             <option value="Documental">Documental</option>
             <option value="Musical">Musical</option>
+            <option value="Serie">Serie</option>
           </select>
 
-          <select 
+          <select
             id="priority-select"
-            class="p-3 rounded bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
+            class="p-3 rounded focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
           >
             <option value="high">Alta</option>
             <option value="medium" selected>Media</option>
             <option value="low">Baja</option>
           </select>
 
-          <button 
+          <button
             type="submit"
             class="px-4 py-3 bg-blue-700 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
           >
@@ -152,25 +123,35 @@
           </button>
         </form>
 
-        <!-- BOTONES DE ACCIÓN -->
-        <div class="flex flex-wrap gap-2">
-          <button 
+        <!-- BOTONES -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button
             id="random-movie-btn"
             class="px-4 py-3 bg-purple-700 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
           >
             🎬 Peli para esta noche
           </button>
 
-          <button 
+          <button
             id="sort-movies-btn"
-            class="px-4 py-3 bg-indigo-700 text-white rounded hover:bg-indigo-600 transition"
+            class="px-4 py-3 bg-indigo-700 text-white rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
           >
             Ordenar películas
           </button>
+
+          <span
+            id="seen-counter"
+            class="ml-auto inline-flex items-center px-3 py-2 rounded bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 font-semibold text-sm"
+          >
+            Vistas: 0
+          </span>
         </div>
 
-        <!-- RESULTADO -->
+        <!-- MENSAJES -->
         <p id="random-result" class="text-yellow-400 text-xl font-bold mt-3"></p>
+        <p id="loading-state" class="hidden text-blue-400 font-semibold mt-2">Cargando datos...</p>
+        <p id="error-state" class="hidden text-red-400 font-semibold mt-2">Ha ocurrido un error.</p>
+        <p id="success-state" class="hidden text-green-400 font-semibold mt-2">Operación realizada correctamente.</p>
 
         <!-- LISTA -->
         <section class="task-list space-y-4"></section>

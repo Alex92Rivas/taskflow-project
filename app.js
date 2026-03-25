@@ -17,7 +17,11 @@ const TMDB_API_KEY = "f06236af98eb2eb04b3d3760a445a7c2";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/original";
 const THEME_STORAGE_KEY = "theme";
 const GENRES_OPEN_STORAGE_KEY = "genresOpen";
-const API_BASE_URL = "http://localhost:3000/api/v1/tasks";
+
+const API_BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/api/v1/tasks"
+    : "https://taskflow-project-backend-alpha.vercel.app/api/v1/tasks";
 
 const loadingState = document.getElementById("loading-state");
 const errorState = document.getElementById("error-state");

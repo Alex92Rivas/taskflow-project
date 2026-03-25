@@ -62,7 +62,6 @@ html:not(.dark) #task-input::placeholder {
   color: #6b7280 !important;
 }
 
-/* Opciones del select */
 #category-select option,
 #priority-select option {
   color: black !important;
@@ -70,7 +69,7 @@ html:not(.dark) #task-input::placeholder {
 }
 
 /* =========================
-   ESTRUCTURA PRINCIPAL EN MODO CLARO
+   HEADER Y MAIN EN MODO CLARO
 ========================= */
 
 html:not(.dark) header {
@@ -80,9 +79,9 @@ html:not(.dark) header {
 }
 
 html:not(.dark) main {
-  background: #f9fafb !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   color: #111827;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db;
 }
 
 html:not(.dark) #theme-toggle {
@@ -111,7 +110,7 @@ html:not(.dark) #success-state {
 }
 
 /* =========================
-   SIDEBAR GÉNEROS - MODO OSCURO / CLARO
+   SIDEBAR GÉNEROS
 ========================= */
 
 .sidebar {
@@ -120,43 +119,43 @@ html:not(.dark) #success-state {
 
 /* Modo oscuro */
 html.dark .sidebar {
-  background: #1e293b;
-  border-right: 1px solid #334155;
+  background: #1e293b !important;
+  border-right: 1px solid #334155 !important;
 }
 
 html.dark #toggle-genres {
-  color: #facc15;
-  border-bottom-color: #475569;
+  color: #facc15 !important;
+  border-bottom-color: #475569 !important;
 }
 
 html.dark .sidebar ul li {
-  color: #facc15;
+  color: #facc15 !important;
 }
 
 html.dark .sidebar ul li:hover {
   background: rgba(255, 255, 255, 0.06);
-  color: #fde68a;
+  color: #fde68a !important;
 }
 
 /* Modo claro */
 html:not(.dark) .sidebar {
-  background: #ffffff;
-  border-right: 1px solid #d1d5db;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-right: 1px solid #d1d5db !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 html:not(.dark) #toggle-genres {
-  color: #1f2937;
-  border-bottom-color: #d1d5db;
+  color: #1f2937 !important;
+  border-bottom-color: #d1d5db !important;
 }
 
 html:not(.dark) .sidebar ul li {
-  color: #374151;
+  color: #374151 !important;
 }
 
 html:not(.dark) .sidebar ul li:hover {
   background: #f3f4f6;
-  color: #111827;
+  color: #111827 !important;
 }
 
 /* =========================
@@ -181,11 +180,11 @@ html:not(.dark) .sidebar ul li:hover {
 }
 
 #genre-list {
-  transition: all 0.25s ease;
+  display: block;
 }
 
 #genre-list.hidden {
-  display: none;
+  display: none !important;
 }
 
 /* =========================
@@ -195,8 +194,7 @@ html:not(.dark) .sidebar ul li:hover {
 .sidebar ul li {
   padding: 0.45rem 0.55rem;
   border-radius: 0.5rem;
-  transition: background-color 0.2s ease, color 0.2s ease,
-    transform 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .sidebar ul li:hover {
@@ -225,29 +223,6 @@ html:not(.dark) .sidebar ul li:hover {
 }
 
 /* =========================
-   PELÍCULA VISTA
-========================= */
-
-.movie-card.opacity-60 {
-  position: relative;
-}
-
-.movie-card.opacity-60::after {
-  content: "Vista";
-  position: absolute;
-  left: 1rem;
-  bottom: 0.8rem;
-  background: rgba(22, 163, 74, 0.92);
-  color: white;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 0.25rem 0.55rem;
-  border-radius: 999px;
-  z-index: 5;
-  letter-spacing: 0.02em;
-}
-
-/* =========================
    BOTÓN RÁPIDO "VISTA"
 ========================= */
 
@@ -263,7 +238,7 @@ html:not(.dark) .sidebar ul li:hover {
 }
 
 /* =========================
-   MENÚ DESPLEGABLE DE CADA PELÍCULA
+   MENÚ DESPLEGABLE
 ========================= */
 
 .menu-dropdown {
@@ -275,7 +250,23 @@ html:not(.dark) .sidebar ul li:hover {
 }
 
 /* =========================
-   CONTADOR DE VISTAS
+   MENSAJES DE ESTADO
+========================= */
+
+#loading-state,
+#error-state,
+#success-state {
+  padding: 0.25rem 0;
+}
+
+#error-state,
+#success-state,
+#loading-state {
+  font-weight: 600;
+}
+
+/* =========================
+   CONTADOR
 ========================= */
 
 #seen-counter {
@@ -283,7 +274,22 @@ html:not(.dark) .sidebar ul li:hover {
 }
 
 /* =========================
-   MEJORAS RESPONSIVE
+   GÉNERO ACTIVO
+========================= */
+
+.active-category {
+  background: rgba(59, 130, 246, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.25);
+}
+
+html:not(.dark) .active-category {
+  background: #e5e7eb;
+  color: #111827 !important;
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.08);
+}
+
+/* =========================
+   RESPONSIVE
 ========================= */
 
 @media (max-width: 1024px) {
@@ -303,5 +309,9 @@ html:not(.dark) .sidebar ul li:hover {
     width: 100%;
     justify-content: center;
     margin-left: 0 !important;
+  }
+
+  main {
+    min-height: auto !important;
   }
 }

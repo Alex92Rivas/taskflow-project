@@ -19,7 +19,8 @@ const THEME_STORAGE_KEY = "theme";
 const GENRES_OPEN_STORAGE_KEY = "genresOpen";
 
 const API_BASE_URL =
-  window.location.hostname === "localhost"
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
     ? "http://localhost:3000/api/v1/tasks"
     : "https://taskflow-project-backend-alpha.vercel.app/api/v1/tasks";
 
@@ -34,7 +35,7 @@ const IS_LOCAL =
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1";
 
-let apiAvailable = IS_LOCAL;
+let apiAvailable = true;
 let demoCurrentId = 1000;
 
 const defaultTasks = [
@@ -163,7 +164,7 @@ function escapeHtml(text) {
 }
 
 function getFallbackImage(title) {
-  const safeTitle = encodeURIComponent(title || "MovieNight Planner");
+  const safeTitle = escapeHtml(title || "MovieNight Planner");
 
   return `data:image/svg+xml;charset=UTF-8,
   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 500'>
@@ -339,10 +340,12 @@ async function getTasksFromApi() {
 }
 
 async function createTaskInApi(task) {
-  return apiFetch(API_BASE_URL, {
+  const createdTask = await apiFetch(API_BASE_URL, {
     method: "POST",
     body: JSON.stringify(task),
   });
+
+  return createdTask ? normalizeTask(createdTask) : null;
 }
 
 async function deleteTaskInApi(id) {
@@ -352,10 +355,12 @@ async function deleteTaskInApi(id) {
 }
 
 async function updateTaskInApi(id, updates) {
-  return apiFetch(`${API_BASE_URL}/${id}`, {
+  const updatedTask = await apiFetch(`${API_BASE_URL}/${id}`, {
     method: "PATCH",
     body: JSON.stringify(updates),
   });
+
+  return updatedTask ? normalizeTask(updatedTask) : null;
 }
 
 function applyFilters() {

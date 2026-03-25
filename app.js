@@ -1,6 +1,3 @@
-console.log("APP NUEVA CARGADA OK");
-alert("APP NUEVA CARGADA OK");
-
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
 const taskList = document.querySelector(".task-list");
@@ -90,15 +87,20 @@ function isValidTaskTitle(title) {
 
 function getMovieTitles() {
   const movies = [];
+  if (!taskList) return movies;
+
   taskList.querySelectorAll("article").forEach((card) => {
     if (card.style.display !== "none") {
       movies.push(card.dataset.title);
     }
   });
+
   return movies;
 }
 
 function showRandomMovie(movieTitle) {
+  if (!randomResult) return;
+
   randomResult.textContent = `🎬 Hoy toca ver: ${movieTitle}`;
   randomResult.classList.remove("random-appear");
   void randomResult.offsetWidth;
@@ -130,14 +132,14 @@ function showError(message = "Ha ocurrido un error.") {
 }
 
 function showSuccess(message = "Operación realizada correctamente.") {
-  if (successState) {
-    successState.textContent = message;
-    successState.classList.remove("hidden");
+  if (!successState) return;
 
-    setTimeout(() => {
-      successState.classList.add("hidden");
-    }, 2000);
-  }
+  successState.textContent = message;
+  successState.classList.remove("hidden");
+
+  setTimeout(() => {
+    successState.classList.add("hidden");
+  }, 2000);
 }
 
 function escapeHtml(text) {
@@ -285,7 +287,9 @@ async function fetchMovieImages(title) {
 
     return {
       poster: movie.poster_path ? `${TMDB_IMAGE_BASE}${movie.poster_path}` : "",
-      backdrop: movie.backdrop_path ? `${TMDB_IMAGE_BASE}${movie.backdrop_path}` : "",
+      backdrop: movie.backdrop_path
+        ? `${TMDB_IMAGE_BASE}${movie.backdrop_path}`
+        : "",
     };
   } catch (error) {
     console.error("Error obteniendo imágenes de TMDB:", error);
@@ -341,6 +345,8 @@ async function updateTaskInApi(id, updates) {
 }
 
 function applyFilters() {
+  if (!taskList) return;
+
   const searchText = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
   taskList.querySelectorAll("article").forEach((card) => {
@@ -360,6 +366,8 @@ function applyFilters() {
 }
 
 async function renderTasks(tasks) {
+  if (!taskList) return;
+
   const normalizedTasks = tasks.map(normalizeTask);
 
   const hydratedTasks = await Promise.all(
@@ -414,6 +422,8 @@ async function ensureDefaultTasks() {
 }
 
 function createTaskCard(task) {
+  if (!taskList) return;
+
   task = normalizeTask(task);
 
   const taskCard = document.createElement("article");
@@ -635,49 +645,53 @@ document.addEventListener("click", () => {
   closeAllMenus();
 });
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+if (form) {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  const taskName = input.value.trim();
-  const category = document.getElementById("category-select").value;
-  const priority = document.getElementById("priority-select").value;
+    const taskName = input.value.trim();
+    const category = document.getElementById("category-select").value;
+    const priority = document.getElementById("priority-select").value;
 
-  if (!isValidTaskTitle(taskName)) {
-    showError("Introduce un título válido de al menos 2 caracteres.");
-    return;
-  }
+    if (!isValidTaskTitle(taskName)) {
+      showError("Introduce un título válido de al menos 2 caracteres.");
+      return;
+    }
 
-  showLoading("Añadiendo película...");
+    showLoading("Añadiendo película...");
 
-  try {
-    const { poster, backdrop } = await fetchMovieImages(taskName);
+    try {
+      const { poster, backdrop } = await fetchMovieImages(taskName);
 
-    await createTaskInApi({
-      title: taskName,
-      category,
-      priority,
-      label: getPriorityLabel(priority),
-      completed: false,
-      poster,
-      backdrop,
-    });
+      await createTaskInApi({
+        title: taskName,
+        category,
+        priority,
+        label: getPriorityLabel(priority),
+        completed: false,
+        poster,
+        backdrop,
+      });
 
-    form.reset();
-    await refreshTasks();
-    showSuccess("Película añadida correctamente.");
-  } catch (error) {
-    showError(error.message);
-  } finally {
-    hideLoading();
-  }
-});
+      form.reset();
+      await refreshTasks();
+      showSuccess("Película añadida correctamente.");
+    } catch (error) {
+      showError(error.message);
+    } finally {
+      hideLoading();
+    }
+  });
+}
 
 if (randomBtn) {
   randomBtn.addEventListener("click", () => {
     const movies = getMovieTitles();
 
     if (movies.length === 0) {
-      randomResult.textContent = "No hay películas visibles en la lista.";
+      if (randomResult) {
+        randomResult.textContent = "No hay películas visibles en la lista.";
+      }
       return;
     }
 
@@ -688,6 +702,8 @@ if (randomBtn) {
 
 if (sortBtn) {
   sortBtn.addEventListener("click", () => {
+    if (!taskList) return;
+
     const cards = Array.from(taskList.querySelectorAll("article"));
 
     cards.sort((a, b) => {

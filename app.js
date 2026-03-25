@@ -26,6 +26,13 @@ const successState = document.getElementById("success-state");
 let activeCategory = "Todas";
 let tasksState = [];
 
+const IS_LOCAL =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+let apiAvailable = IS_LOCAL;
+let demoCurrentId = 1000;
+
 const defaultTasks = [
   {
     title: "El Caballero Oscuro",
@@ -125,7 +132,7 @@ function showError(message = "Ha ocurrido un error.") {
 
     setTimeout(() => {
       errorState.classList.add("hidden");
-    }, 3000);
+    }, 3500);
   } else {
     alert(message);
   }
@@ -139,7 +146,7 @@ function showSuccess(message = "Operación realizada correctamente.") {
 
   setTimeout(() => {
     successState.classList.add("hidden");
-  }, 2000);
+  }, 2200);
 }
 
 function escapeHtml(text) {
@@ -225,7 +232,10 @@ function loadTheme() {
 function updateSeenCounter() {
   if (!seenCounter) return;
 
-  const totalSeen = tasksState.filter((task) => parseCompleted(task.completed)).length;
+  const totalSeen = tasksState.filter((task) =>
+    parseCompleted(task.completed)
+  ).length;
+
   seenCounter.textContent = `Vistas: ${totalSeen}`;
 }
 
@@ -392,33 +402,80 @@ async function renderTasks(tasks) {
 }
 
 async function refreshTasks() {
-  tasksState = await getTasksFromApi();
+  if (apiAvailable) {
+    tasksState = await getTasksFromApi();
+  }
+
   updateSeenCounter();
   await renderTasks(tasksState);
 }
 
-async function ensureDefaultTasks() {
-  const existingTasks = await getTasksFromApi();
+function getNextDemoId() {
+  demoCurrentId += 1;
+  return demoCurrentId;
+}
 
-  if (existingTasks.length > 0) {
-    tasksState = existingTasks;
+async function buildDemoTasks() {
+  const demoTasks = await Promise.all(
+    defaultTasks.map(async (task, index) => {
+      const images = await fetchMovieImages(task.title);
+      return normalizeTask({
+        id: index + 1,
+        ...task,
+        poster: images.poster || "",
+        backdrop: images.backdrop || "",
+      });
+    })
+  );
+
+  demoCurrentId = demoTasks.length;
+  return demoTasks;
+}
+
+async function ensureDefaultTasks() {
+  if (!apiAvailable) {
+    tasksState = await buildDemoTasks();
     updateSeenCounter();
     await renderTasks(tasksState);
+    showSuccess("Modo demo cargado correctamente.");
     return;
   }
 
-  for (const task of defaultTasks) {
-    const images = await fetchMovieImages(task.title);
+  try {
+    const existingTasks = await getTasksFromApi();
 
-    await createTaskInApi({
-      ...task,
-      poster: images.poster || "",
-      backdrop: images.backdrop || "",
-      completed: false,
-    });
+    if (existingTasks.length > 0) {
+      tasksState = existingTasks;
+      updateSeenCounter();
+      await renderTasks(tasksState);
+      return;
+    }
+
+    for (const task of defaultTasks) {
+      const images = await fetchMovieImages(task.title);
+
+      await createTaskInApi({
+        ...task,
+        poster: images.poster || "",
+        backdrop: images.backdrop || "",
+        completed: false,
+      });
+    }
+
+    tasksState = await getTasksFromApi();
+    updateSeenCounter();
+    await renderTasks(tasksState);
+  } catch (error) {
+    console.warn("API no disponible. Se activa modo demo.", error);
+    apiAvailable = false;
+    tasksState = await buildDemoTasks();
+    updateSeenCounter();
+    await renderTasks(tasksState);
+
+    showError(
+      "No se ha podido conectar con el servidor. Se ha cargado una versión demo para revisión."
+    );
   }
-
-  await refreshTasks();
 }
 
 function createTaskCard(task) {
@@ -539,19 +596,22 @@ function createTaskCard(task) {
     try {
       const id = Number(taskCard.dataset.id);
 
-      await updateTaskInApi(id, {
-        completed: true,
-      });
+      if (apiAvailable) {
+        await updateTaskInApi(id, { completed: true });
+        await refreshTasks();
+      } else {
+        tasksState = tasksState.map((movie) =>
+          movie.id === id ? { ...movie, completed: true } : movie
+        );
+        await refreshTasks();
+      }
 
-      taskCard.dataset.completed = "true";
-      taskCard.style.display = "none";
-
-      await refreshTasks();
       showSuccess("Película marcada como vista.");
     } catch (error) {
       showError(error.message);
     } finally {
       hideLoading();
+      closeAllMenus();
     }
   }
 
@@ -586,11 +646,24 @@ function createTaskCard(task) {
       const { poster, backdrop } = await fetchMovieImages(trimmedTitle);
       const id = Number(taskCard.dataset.id);
 
-      await updateTaskInApi(id, {
-        title: trimmedTitle,
-        poster: poster || "",
-        backdrop: backdrop || "",
-      });
+      if (apiAvailable) {
+        await updateTaskInApi(id, {
+          title: trimmedTitle,
+          poster: poster || "",
+          backdrop: backdrop || "",
+        });
+      } else {
+        tasksState = tasksState.map((movie) =>
+          movie.id === id
+            ? {
+                ...movie,
+                title: trimmedTitle,
+                poster: poster || "",
+                backdrop: backdrop || "",
+              }
+            : movie
+        );
+      }
 
       titleElement.textContent = trimmedTitle;
       imageElement.src = backdrop || poster || getFallbackImage(trimmedTitle);
@@ -611,8 +684,13 @@ function createTaskCard(task) {
 
     try {
       const id = Number(taskCard.dataset.id);
-      await deleteTaskInApi(id);
-      taskCard.remove();
+
+      if (apiAvailable) {
+        await deleteTaskInApi(id);
+      } else {
+        tasksState = tasksState.filter((movie) => movie.id !== id);
+      }
+
       await refreshTasks();
       showSuccess("Película eliminada correctamente.");
     } catch (error) {
@@ -628,14 +706,14 @@ function createTaskCard(task) {
 document.addEventListener("DOMContentLoaded", async () => {
   loadTheme();
   loadGenresState();
-  showLoading("Cargando películas desde el servidor...");
+  showLoading("Cargando películas...");
 
   try {
     await ensureDefaultTasks();
     setActiveCategoryUI();
   } catch (error) {
     console.error(error);
-    showError("Error cargando películas desde el servidor.");
+    showError("No se han podido cargar las películas.");
   } finally {
     hideLoading();
   }
@@ -663,19 +741,38 @@ if (form) {
     try {
       const { poster, backdrop } = await fetchMovieImages(taskName);
 
-      await createTaskInApi({
-        title: taskName,
-        category,
-        priority,
-        label: getPriorityLabel(priority),
-        completed: false,
-        poster,
-        backdrop,
-      });
+      if (apiAvailable) {
+        await createTaskInApi({
+          title: taskName,
+          category,
+          priority,
+          label: getPriorityLabel(priority),
+          completed: false,
+          poster,
+          backdrop,
+        });
+      } else {
+        tasksState.unshift(
+          normalizeTask({
+            id: getNextDemoId(),
+            title: taskName,
+            category,
+            priority,
+            label: getPriorityLabel(priority),
+            completed: false,
+            poster,
+            backdrop,
+          })
+        );
+      }
 
       form.reset();
       await refreshTasks();
-      showSuccess("Película añadida correctamente.");
+      showSuccess(
+        apiAvailable
+          ? "Película añadida correctamente."
+          : "Película añadida en modo demo."
+      );
     } catch (error) {
       showError(error.message);
     } finally {

@@ -1,5 +1,3 @@
-console.log("APP NUEVA CARGADA");
-
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
 const taskList = document.querySelector(".task-list");
@@ -436,9 +434,8 @@ async function renderTasks(tasks) {
   const hydratedTasks = await Promise.all(
     normalizedTasks.map(async (task) => {
       if (
-        task.poster ||
-        task.backdrop ||
-        task.releaseYear ||
+        (task.poster || task.backdrop) &&
+        task.releaseYear &&
         task.tmdbRating !== null
       ) {
         return task;
@@ -448,8 +445,8 @@ async function renderTasks(tasks) {
 
       return {
         ...task,
-        poster: movieData.poster || "",
-        backdrop: movieData.backdrop || "",
+        poster: task.poster || movieData.poster || "",
+        backdrop: task.backdrop || movieData.backdrop || "",
         releaseYear: movieData.releaseYear || "",
         tmdbRating: movieData.tmdbRating,
       };

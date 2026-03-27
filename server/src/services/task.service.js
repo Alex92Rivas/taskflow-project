@@ -13,6 +13,8 @@ const createTask = ({
   completed = false,
   poster = "",
   backdrop = "",
+  releaseYear = "",
+  tmdbRating = null,
 }) => {
   const newTask = {
     id: currentId++,
@@ -23,6 +25,8 @@ const createTask = ({
     completed,
     poster,
     backdrop,
+    releaseYear,
+    tmdbRating,
   };
 
   tasks.push(newTask);
@@ -53,6 +57,8 @@ const updateTask = (id, data) => {
   if (data.completed !== undefined) task.completed = data.completed;
   if (data.poster !== undefined) task.poster = data.poster;
   if (data.backdrop !== undefined) task.backdrop = data.backdrop;
+  if (data.releaseYear !== undefined) task.releaseYear = data.releaseYear;
+  if (data.tmdbRating !== undefined) task.tmdbRating = data.tmdbRating;
 
   return task;
 };

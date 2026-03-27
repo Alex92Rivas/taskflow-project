@@ -1,3 +1,5 @@
+console.log("APP NUEVA CARGADA");
+
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
 const taskList = document.querySelector(".task-list");
@@ -31,10 +33,6 @@ const successState = document.getElementById("success-state");
 let activeCategory = "Todas";
 let tasksState = [];
 
-const IS_LOCAL =
-  window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1";
-
 let apiAvailable = true;
 let demoCurrentId = 1000;
 
@@ -47,6 +45,8 @@ const defaultTasks = [
     completed: false,
     poster: "",
     backdrop: "",
+    releaseYear: "",
+    tmdbRating: null,
   },
   {
     title: "Superbad",
@@ -56,6 +56,8 @@ const defaultTasks = [
     completed: false,
     poster: "",
     backdrop: "",
+    releaseYear: "",
+    tmdbRating: null,
   },
   {
     title: "Interstellar",
@@ -65,6 +67,8 @@ const defaultTasks = [
     completed: false,
     poster: "",
     backdrop: "",
+    releaseYear: "",
+    tmdbRating: null,
   },
   {
     title: "La La Land",
@@ -74,6 +78,8 @@ const defaultTasks = [
     completed: false,
     poster: "",
     backdrop: "",
+    releaseYear: "",
+    tmdbRating: null,
   },
 ];
 
@@ -91,6 +97,13 @@ function getPriorityColor(priority) {
   if (priority === "high") return "bg-red-600 dark:bg-red-500";
   if (priority === "medium") return "bg-sky-500 dark:bg-sky-400";
   return "bg-green-600 dark:bg-green-500";
+}
+
+function getRatingColor(rating) {
+  if (rating === null || Number.isNaN(rating)) return "text-gray-300";
+  if (rating >= 8) return "text-green-300";
+  if (rating >= 6) return "text-yellow-300";
+  return "text-red-300";
 }
 
 function isValidTaskTitle(title) {
@@ -199,6 +212,11 @@ function normalizeTask(task) {
     completed: parseCompleted(task.completed),
     poster: task.poster || "",
     backdrop: task.backdrop || "",
+    releaseYear: task.releaseYear || "",
+    tmdbRating:
+      task.tmdbRating !== undefined && task.tmdbRating !== null
+        ? Number(task.tmdbRating)
+        : null,
   };
 }
 
@@ -277,7 +295,12 @@ function loadGenresState() {
 
 async function fetchMovieImages(title) {
   if (!TMDB_API_KEY || TMDB_API_KEY === "PEGA_AQUI_TU_API_KEY") {
-    return { poster: "", backdrop: "" };
+    return {
+      poster: "",
+      backdrop: "",
+      releaseYear: "",
+      tmdbRating: null,
+    };
   }
 
   try {
@@ -297,18 +320,39 @@ async function fetchMovieImages(title) {
     const movie = data.results?.[0];
 
     if (!movie) {
-      return { poster: "", backdrop: "" };
+      return {
+        poster: "",
+        backdrop: "",
+        releaseYear: "",
+        tmdbRating: null,
+      };
     }
+
+    const releaseYear = movie.release_date
+      ? movie.release_date.slice(0, 4)
+      : "";
+
+    const tmdbRating =
+      typeof movie.vote_average === "number"
+        ? Number(movie.vote_average.toFixed(1))
+        : null;
 
     return {
       poster: movie.poster_path ? `${TMDB_IMAGE_BASE}${movie.poster_path}` : "",
       backdrop: movie.backdrop_path
         ? `${TMDB_IMAGE_BASE}${movie.backdrop_path}`
         : "",
+      releaseYear,
+      tmdbRating,
     };
   } catch (error) {
-    console.error("Error obteniendo imágenes de TMDB:", error);
-    return { poster: "", backdrop: "" };
+    console.error("Error obteniendo datos de TMDB:", error);
+    return {
+      poster: "",
+      backdrop: "",
+      releaseYear: "",
+      tmdbRating: null,
+    };
   }
 }
 
@@ -391,16 +435,23 @@ async function renderTasks(tasks) {
 
   const hydratedTasks = await Promise.all(
     normalizedTasks.map(async (task) => {
-      if (task.poster || task.backdrop) {
+      if (
+        task.poster ||
+        task.backdrop ||
+        task.releaseYear ||
+        task.tmdbRating !== null
+      ) {
         return task;
       }
 
-      const images = await fetchMovieImages(task.title);
+      const movieData = await fetchMovieImages(task.title);
 
       return {
         ...task,
-        poster: images.poster || "",
-        backdrop: images.backdrop || "",
+        poster: movieData.poster || "",
+        backdrop: movieData.backdrop || "",
+        releaseYear: movieData.releaseYear || "",
+        tmdbRating: movieData.tmdbRating,
       };
     })
   );
@@ -427,12 +478,14 @@ function getNextDemoId() {
 async function buildDemoTasks() {
   const demoTasks = await Promise.all(
     defaultTasks.map(async (task, index) => {
-      const images = await fetchMovieImages(task.title);
+      const movieData = await fetchMovieImages(task.title);
       return normalizeTask({
         id: index + 1,
         ...task,
-        poster: images.poster || "",
-        backdrop: images.backdrop || "",
+        poster: movieData.poster || "",
+        backdrop: movieData.backdrop || "",
+        releaseYear: movieData.releaseYear || "",
+        tmdbRating: movieData.tmdbRating,
       });
     })
   );
@@ -461,12 +514,14 @@ async function ensureDefaultTasks() {
     }
 
     for (const task of defaultTasks) {
-      const images = await fetchMovieImages(task.title);
+      const movieData = await fetchMovieImages(task.title);
 
       await createTaskInApi({
         ...task,
-        poster: images.poster || "",
-        backdrop: images.backdrop || "",
+        poster: movieData.poster || "",
+        backdrop: movieData.backdrop || "",
+        releaseYear: movieData.releaseYear || "",
+        tmdbRating: movieData.tmdbRating,
         completed: false,
       });
     }
@@ -502,8 +557,24 @@ function createTaskCard(task) {
   taskCard.dataset.completed = task.completed ? "true" : "false";
   taskCard.dataset.poster = task.poster || "";
   taskCard.dataset.backdrop = task.backdrop || "";
+  taskCard.dataset.releaseYear = task.releaseYear || "";
+  taskCard.dataset.tmdbRating =
+    task.tmdbRating !== null && task.tmdbRating !== undefined
+      ? String(task.tmdbRating)
+      : "";
 
   const imageUrl = getBestImage(task);
+
+  const movieMeta = task.releaseYear
+    ? `${task.category} / ${task.releaseYear}`
+    : task.category;
+
+  const movieRating =
+    task.tmdbRating !== null && !Number.isNaN(task.tmdbRating)
+      ? `⭐ ${task.tmdbRating} TMDB`
+      : "⭐ Sin nota TMDB";
+
+  const ratingColorClass = getRatingColor(task.tmdbRating);
 
   taskCard.className =
     "movie-card relative z-0 flex items-stretch bg-gray-100 dark:bg-gray-700/80 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 overflow-visible min-h-[150px]";
@@ -524,9 +595,14 @@ function createTaskCard(task) {
           <h3 class="movie-title text-xl font-extrabold text-white leading-tight max-w-[250px]">
             ${escapeHtml(task.title)}
           </h3>
-          <span class="movie-category text-sm font-medium text-gray-200 mt-2 max-w-[250px]">
-            ${escapeHtml(task.category)}
-          </span>
+
+          <p class="movie-category text-sm font-medium text-gray-200 mt-2 max-w-[250px]">
+            ${escapeHtml(movieMeta)}
+          </p>
+
+          <p class="movie-rating text-sm font-semibold mt-1 max-w-[250px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${ratingColorClass}">
+            ${escapeHtml(movieRating)}
+          </p>
         </div>
       </div>
 
@@ -652,7 +728,8 @@ function createTaskCard(task) {
     showLoading("Editando película...");
 
     try {
-      const { poster, backdrop } = await fetchMovieImages(trimmedTitle);
+      const { poster, backdrop, releaseYear, tmdbRating } =
+        await fetchMovieImages(trimmedTitle);
       const id = Number(taskCard.dataset.id);
 
       if (apiAvailable) {
@@ -660,6 +737,8 @@ function createTaskCard(task) {
           title: trimmedTitle,
           poster: poster || "",
           backdrop: backdrop || "",
+          releaseYear: releaseYear || "",
+          tmdbRating,
         });
       } else {
         tasksState = tasksState.map((movie) =>
@@ -669,6 +748,8 @@ function createTaskCard(task) {
                 title: trimmedTitle,
                 poster: poster || "",
                 backdrop: backdrop || "",
+                releaseYear: releaseYear || "",
+                tmdbRating,
               }
             : movie
         );
@@ -748,7 +829,8 @@ if (form) {
     showLoading("Añadiendo película...");
 
     try {
-      const { poster, backdrop } = await fetchMovieImages(taskName);
+      const { poster, backdrop, releaseYear, tmdbRating } =
+        await fetchMovieImages(taskName);
 
       if (apiAvailable) {
         await createTaskInApi({
@@ -759,6 +841,8 @@ if (form) {
           completed: false,
           poster,
           backdrop,
+          releaseYear,
+          tmdbRating,
         });
       } else {
         tasksState.unshift(
@@ -771,6 +855,8 @@ if (form) {
             completed: false,
             poster,
             backdrop,
+            releaseYear,
+            tmdbRating,
           })
         );
       }

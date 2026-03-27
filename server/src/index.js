@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-require("./config/env");
+const { port } = require("./config/env");
 const taskRoutes = require("./routes/task.routes");
 
 const app = express();
@@ -37,4 +37,6 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ error: "Error interno del servidor." });
 });
 
-module.exports = app;
+app.listen(port, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
+});

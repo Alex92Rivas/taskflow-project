@@ -16,7 +16,6 @@
 </head>
 
 <body class="bg-gradient-to-r from-black to-red-900 text-gray-100 min-h-screen transition-colors duration-300">
-  <!-- HEADER -->
   <header class="bg-gray-800/80 backdrop-blur-sm text-red-400 p-4 shadow-lg mb-4 transition-colors duration-300">
     <div class="w-full px-4 md:px-6 lg:px-8 flex items-center justify-between">
       <div class="w-12"></div>
@@ -33,16 +32,15 @@
         class="w-12 h-12 flex items-center justify-center bg-gray-700 text-yellow-400 rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-300"
         aria-label="Alternar modo claro y oscuro"
         title="Alternar modo claro y oscuro"
+        type="button"
       >
         💡
       </button>
     </div>
   </header>
 
-  <!-- CONTENEDOR PRINCIPAL -->
   <div class="w-full px-4 md:px-6 lg:px-8 pb-6">
     <div class="flex flex-col lg:flex-row gap-6 items-start">
-      <!-- ASIDE -->
       <aside class="sidebar w-full lg:w-64 shrink-0 p-4 rounded shadow-lg transition-colors duration-300">
         <button
           id="toggle-genres"
@@ -70,29 +68,26 @@
         </ul>
       </aside>
 
-      <!-- MAIN -->
       <main class="flex-1 w-full space-y-4 bg-gray-800/90 p-4 rounded shadow min-h-[70vh] transition-colors duration-300">
-        <!-- BUSCADOR -->
         <input
           type="text"
           id="search-input"
           placeholder="Buscar película..."
-          class="w-full p-3 rounded focus:ring focus:ring-yellow-400 focus:outline-none transition text-base"
+          class="w-full p-3 rounded focus:ring focus:ring-yellow-400 focus:outline-none transition text-base bg-gray-700 text-white placeholder-gray-300 dark:bg-gray-700 dark:text-white"
         />
 
-        <!-- FORMULARIO -->
         <form id="task-form" class="flex flex-col md:flex-row gap-2 md:items-stretch">
           <input
             type="text"
             id="task-input"
             placeholder="Añadir nueva película..."
             required
-            class="flex-1 p-3 rounded focus:ring focus:ring-blue-400 focus:outline-none transition text-base"
+            class="flex-1 p-3 rounded focus:ring focus:ring-blue-400 focus:outline-none transition text-base bg-gray-700 text-white placeholder-gray-300 dark:bg-gray-700 dark:text-white"
           />
 
           <select
             id="category-select"
-            class="p-3 rounded focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
+            class="p-3 rounded focus:outline-none focus:ring focus:ring-blue-400 transition text-base bg-gray-700 text-white dark:bg-gray-700 dark:text-white"
           >
             <option value="Acción">Acción</option>
             <option value="Comedia">Comedia</option>
@@ -108,7 +103,7 @@
 
           <select
             id="priority-select"
-            class="p-3 rounded focus:outline-none focus:ring focus:ring-blue-400 transition text-base"
+            class="p-3 rounded focus:outline-none focus:ring focus:ring-blue-400 transition text-base bg-gray-700 text-white dark:bg-gray-700 dark:text-white"
           >
             <option value="high">Alta</option>
             <option value="medium" selected>Media</option>
@@ -123,10 +118,10 @@
           </button>
         </form>
 
-        <!-- BOTONES -->
         <div class="flex flex-wrap items-center gap-2">
           <button
             id="random-movie-btn"
+            type="button"
             class="px-4 py-3 bg-purple-700 text-white rounded hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-300"
           >
             🎬 Peli para esta noche
@@ -134,6 +129,7 @@
 
           <button
             id="sort-movies-btn"
+            type="button"
             class="px-4 py-3 bg-indigo-700 text-white rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
           >
             Ordenar películas
@@ -147,14 +143,16 @@
           </span>
         </div>
 
-        <!-- MENSAJES -->
         <p id="random-result" class="text-yellow-400 text-xl font-bold mt-3"></p>
         <p id="loading-state" class="hidden text-blue-400 font-semibold mt-2">Cargando datos...</p>
         <p id="error-state" class="hidden text-red-400 font-semibold mt-2">Ha ocurrido un error.</p>
         <p id="success-state" class="hidden text-green-400 font-semibold mt-2">Operación realizada correctamente.</p>
 
-        <!-- LISTA -->
-        <section class="task-list space-y-4"></section>
+        <section
+          class="task-list space-y-4"
+          aria-live="polite"
+          aria-label="Lista de películas"
+        ></section>
       </main>
     </div>
   </div>

@@ -22,6 +22,8 @@ const createTask = (req, res) => {
     completed = false,
     poster = "",
     backdrop = "",
+    releaseYear = "",
+    tmdbRating = null,
   } = req.body;
 
   if (!title || typeof title !== "string" || title.trim().length < 2) {
@@ -54,6 +56,21 @@ const createTask = (req, res) => {
     });
   }
 
+  if (typeof releaseYear !== "string") {
+    return res.status(400).json({
+      error: "releaseYear debe ser texto.",
+    });
+  }
+
+  if (
+    tmdbRating !== null &&
+    (typeof tmdbRating !== "number" || Number.isNaN(tmdbRating))
+  ) {
+    return res.status(400).json({
+      error: "tmdbRating debe ser un número o null.",
+    });
+  }
+
   const newTask = taskService.createTask({
     title,
     category,
@@ -62,6 +79,8 @@ const createTask = (req, res) => {
     completed,
     poster,
     backdrop,
+    releaseYear,
+    tmdbRating,
   });
 
   res.status(201).json(newTask);
@@ -108,6 +127,8 @@ const updateTask = (req, res, next) => {
       completed,
       poster,
       backdrop,
+      releaseYear,
+      tmdbRating,
     } = req.body;
 
     if (title !== undefined) {
@@ -150,6 +171,22 @@ const updateTask = (req, res, next) => {
       });
     }
 
+    if (releaseYear !== undefined && typeof releaseYear !== "string") {
+      return res.status(400).json({
+        error: "Si envías releaseYear, debe ser texto.",
+      });
+    }
+
+    if (
+      tmdbRating !== undefined &&
+      tmdbRating !== null &&
+      (typeof tmdbRating !== "number" || Number.isNaN(tmdbRating))
+    ) {
+      return res.status(400).json({
+        error: "Si envías tmdbRating, debe ser un número o null.",
+      });
+    }
+
     const updatedTask = taskService.updateTask(id, {
       title,
       category,
@@ -158,6 +195,8 @@ const updateTask = (req, res, next) => {
       completed,
       poster,
       backdrop,
+      releaseYear,
+      tmdbRating,
     });
 
     res.status(200).json(updatedTask);
